@@ -1,0 +1,49 @@
+# - title: "An Intro to R, Rstudio, and {tidyverse}"
+#   filename: intro-r-rstudio
+#   tldr: "A tidyverse-oriented lab for introducing students to R and Rstudio."
+# 
+# - title: "Some Basics of Descriptive Inference"
+#   filename: descriptive-inference
+#   tldr: "A lab session on things like modes, medians, means, and variable types."
+#   
+# - title: "Associational and Inferential Techniques"
+#   filename: association-lab
+#   tldr: "A lab session on associational techniques/limitations and a basic discussion of inference."
+# 
+# - title: "Random Assignment and Experiments"
+#   filename: random-assignment-experiments-lab
+#   tldr: "A lab session on random assignment with a partial replication of some of Chapter 1 of Mastering 'Metrics."
+# 
+# - title: "Measurement Error"
+#   filename: measurement-error-lab
+#   tldr: "A lab session on what weird things measurement error can do to our inferences."
+# 
+# - title: "OLS Regression"
+#   filename: ols-lab
+#   tldr: "A lab session on basic OLS and how to unpack it."
+#   
+# - title: "OLS Regression Diagnostics"
+#   filename: ols-diagnostics-lab
+#   tldr: "A lab session on diagnostic checks for OLS and what to do if you flunk one."
+#   
+# - title: "Instrumental Variables"
+#   filename: instrumental-variables-lab
+#   tldr: "A lab session on instrumental variable analysis."
+#   
+# - title: "Logistic Regression"
+#   filename: logistic-regression-lab
+#   tldr: "A lab session on logistic regression: unpacking it and assessing it."
+#   
+# - title: "Ordinal Logistic Regression"
+#   filename: ordinal-logistic-regression-lab
+#   tldr: "A lab session on ordinal logistic regression: unpacking it, assessing it, and when you should use it."
+# 
+# - title: "Making the Most of Regression"
+#   filename: mmr-lab
+#   tldr: "Regression is story-telling and here's how to tell your story well."
+# 
+# - title: "The Basics of Bayesian Inference"
+#   filename: bayes-lab
+#   tldr: "A way too brief introduction to the world of Bayes."
+# 
+# 
