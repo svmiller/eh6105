@@ -1,0 +1,44 @@
+# Site settings
+title: EH6105
+subtitle:  Quantitative Methods
+description: | 
+    The aim of the course is to provide the students with basic knowledge about 
+    quantitative methods in the social sciences, though the topical focus will privilege 
+    applications in economic history and international relations. The course will cover 
+    both descriptive statistics (i.e. summarizing and visualizing information) and 
+    inferential statistics (i.e. making statements about a population based on a sample 
+    of it). The major methodological focus will be ordinary least squares (OLS) regression, 
+    the basic workhorse of applied quantitative methods, though the course will take care 
+    to discuss matters of quantitative research design more broadly. Upon completion of the 
+    course, students should be able to read, interpret and assess quantitative research at a 
+    fundamental level. The class will serve as foundation training for a student's ability to 
+    design and perform a quantitative study, e.g., write a master thesis using quantitative methods.
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://eh6105.svmiller.com" # the base hostname & protocol for your site
+syllabus: "http://eh6105.svmiller.com/syllabus/eh6105-fall2022-syllabus.pdf"
+githubdir: "svmiller/eh6105"
+
+# Author/user information
+email: steven.miller@ekohist.su.se
+twitter_username: stevenvmiller
+github_username:  svmiller
+authorurl: "http://svmiller.com"
+address: |
+    Institutionen för ekonomisk historia och internationella relationer
+    Universitetsvägen 10A (916)
+    114 18 Stockholm, Sweden
+
+
+# Build settings
+markdown: kramdown
+
+# Other options
+permalink: blog/:year/:month/:title
+excerpt_separator: "<!--more-->"
+
+include: ['_images', '_css']
+
+# SEO stuff
+# google_author: ""
+# google_site_verification: ""
+# bing_webmastertools_id: ""
