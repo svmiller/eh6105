@@ -5,3 +5,6 @@
 
 _site/
 _private/
+_materials/
+
+!.gitignore
