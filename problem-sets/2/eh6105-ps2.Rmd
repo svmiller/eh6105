@@ -1,0 +1,51 @@
+---
+title: "Problem Set #2"
+subtitle: "EH6105 - Quantitative Methods"
+author: Steven V. Miller
+output: pdf_document
+
+fontfamily: cochineal
+fontsize: 11pt
+header-includes:
+   - \linespread{1.05}
+urlcolor: blue
+---
+
+This homework makes use of data available in `{stevedata}` and implies the use of `{tidyverse}` to answer the questions. `{tidyverse}` is not necessary to answer these questions though it will assuredly make the process easier. Load these two libraries to get started answering these questions.
+
+```{r, message = F}
+library(tidyverse)
+library(stevedata)
+```
+
+
+# The Usual Daily Drinking Habits of Americans
+
+This homework will refer to the `nesarc_drinkspd` data set that is available in `{stevedata}`. This data set is loosely modified from Wave 1 (2001-2) of the National Epidemiologic Survey on Alcohol and Related Conditions (NESARC) data set, which, in part, asks a nationally representative survey of 43,093 Americans to say how often they consume alcohol on a usual day in which they drink alcohol. You can find out more information about the data by visiting [this part of the package's website](http://svmiller.com/stevedata/reference/nesarc_drinkspd.html), or with the following command.[^anotherhint]
+
+```r
+?nesarc_drinkspd
+```
+
+
+Here's a little preview of these data.
+
+```{r}
+nesarc_drinkspd
+```
+
+Answer these questions. A successful answer of these question must include the R code you used to help you answer the question.
+
+1. What is the mode, median, and mean respondent age in these data?
+2. What is the mode, median, and mean of the `ethrace2a` variable, and why is this a ridiculous question to ask?
+3. What is the mode, median, and mean of the `sex` variable? What does the mean tell you for a binary variable like this?
+4. Recode the `educ` variable into a `collegeed` variable that equals 1 if the respondent says they have a four-year college degree or more.
+5. Recode the `ethrace2a` variable into a dummy `white` variable that equals 1 if the respondent is white (not Hispanic) and 0 if the respondent is some other race or is Hispanic.
+6. Look at the `marital` variable. How many people in the data say they living with someone as married (i.e. "sambos", as you might call them in Sweden)?
+7. Get a histogram of the `age` variable and tell me what you see.
+6. Get a histogram of the `s2aq8b` variable and tell me what you see.
+7. The `s2aq8b` variable is taken "as is" from the original data set, and communicates the number of drinks of any alcoholic type that the respondent says they consume on a given day drinking alcohol in the past 12 months. There are two problematic possible values in here that no longer make this a count variable, as is. What are they, and why are they problematic?
+8.  Recode this variable into a more informative `drinks_consumed` variable, given what you know about the variable from the codebook. Explain what you're doing.
+
+
+[^anotherhint]: You really should always look at the codebook, and definitely here.
