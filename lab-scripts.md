@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Lab Scripts
-permalink: /lab-scripts/
+title: Lab Scripts/Problem Sets
+permalink: /lab-scripts-problem-sets/
 ---
 
 This page contains link to lab scripts throughout the semester. Clicking the title of the lab script will go directly to the ["spun"](https://deanattali.com/2015/03/24/knitrs-best-hidden-gem-spin/) HTML document from the underlying R code. The bottom right icons link to the underlying R script (<i class="fab fa-r-project"></i>) and the HTML document (<i class="fas fa-file-code"></i>).
@@ -21,3 +21,18 @@ This page contains link to lab scripts throughout the semester. Clicking the tit
       </li>
 {% endfor %}
 </ul>
+
+## Problem Sets
+
+### [Problem Set #1](http://eh6105.svmiller.com/problem-sets/1/eh6105-ps1.pdf)
+
+The first problem set makes use of the [Systemic Banking Crises Database II](http://svmiller.com/stevedata/reference/SBCD.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about basic data summary, data exploration, and data manipulation.
+
+### [Problem Set #2](http://eh6105.svmiller.com/problem-sets/2/eh6105-ps2.pdf)
+
+The first problem set makes use of the [National Epidemiologic Survey on Alcohol and Related Conditions (NESARC)](http://svmiller.com/stevedata/reference/nesarc_drinkspd.html) data set in [`{stevedata}`](http://svmiller.com/stevedata) to learn about basic descriptive statistics, recoding things, and, importantly, how you should always read the codebook.
+
+
+### [Problem Set #3](http://eh6105.svmiller.com/problem-sets/3/eh6105-ps3.pdf)
+
+The first problem set makes use of some data available in [`{peacesciencer}`](http://svmiller.com/peacesciencer) to learn bivariate ordinary least squares (OLS) regression.
