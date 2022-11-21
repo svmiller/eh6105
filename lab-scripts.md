@@ -44,4 +44,4 @@ The fourth problem set makes use of [some simple (American) presidential electio
 
 ### [Problem Set #5](http://eh6105.svmiller.com/problem-sets/5/eh6105-ps5.pdf)
 
-The final problem set makes use of [General Social Survey (GSS) data on attitudes about government spending](http://svmiller.com/stevedata/reference/gss_spending.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about OLS model diagnostics.
+The final problem set makes use of [General Social Survey (GSS) data on attitudes about government spending](http://svmiller.com/stevedata/reference/gss_spending.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about OLS model diagnostics. Students will also have the option of bootstrapping their regression model here if they want to go hardcore in the last question. Nothing in the course plan said I couldn't have you choose this path if I wanted.  😜
