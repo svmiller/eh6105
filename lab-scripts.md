@@ -30,14 +30,18 @@ The first problem set makes use of the [Systemic Banking Crises Database II](htt
 
 ### [Problem Set #2](http://eh6105.svmiller.com/problem-sets/2/eh6105-ps2.pdf)
 
-The first problem set makes use of the [National Epidemiologic Survey on Alcohol and Related Conditions (NESARC)](http://svmiller.com/stevedata/reference/nesarc_drinkspd.html) data set in [`{stevedata}`](http://svmiller.com/stevedata) to learn about basic descriptive statistics, recoding things, and, importantly, how you should always read the codebook.
+The second problem set makes use of the [National Epidemiologic Survey on Alcohol and Related Conditions (NESARC)](http://svmiller.com/stevedata/reference/nesarc_drinkspd.html) data set in [`{stevedata}`](http://svmiller.com/stevedata) to learn about basic descriptive statistics, recoding things, and, importantly, how you should always read the codebook.
 
 
 ### [Problem Set #3](http://eh6105.svmiller.com/problem-sets/3/eh6105-ps3.pdf)
 
-The first problem set makes use of some data available in [`{peacesciencer}`](http://svmiller.com/peacesciencer) to learn bivariate ordinary least squares (OLS) regression.
+The third problem set makes use of some data available in [`{peacesciencer}`](http://svmiller.com/peacesciencer) to learn bivariate ordinary least squares (OLS) regression.
 
 
 ### [Problem Set #4](http://eh6105.svmiller.com/problem-sets/4/eh6105-ps4.pdf)
 
-The first problem set makes use of [some simple (American) presidential election data](http://svmiller.com/stevedata/reference/election_turnout.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about simple derivations of the OLS model (e.g. controls, fixed effects).
+The fourth problem set makes use of [some simple (American) presidential election data](http://svmiller.com/stevedata/reference/election_turnout.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about simple derivations of the OLS model (e.g. controls, fixed effects).
+
+### [Problem Set #5](http://eh6105.svmiller.com/problem-sets/5/eh6105-ps5.pdf)
+
+The final problem set makes use of [General Social Survey (GSS) data on attitudes about government spending](http://svmiller.com/stevedata/reference/gss_spending.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about OLS model diagnostics.
