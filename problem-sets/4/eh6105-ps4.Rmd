@@ -19,9 +19,9 @@ library(stevedata)
 ```
 
 
-# State-Level Education and (U.S.) Voter Turnout in 2016.
+# State-Level Education and (U.S.) Voter Turnout in 2016
 
-This homework will refer to the `election_turnout` data set that is available in `{stevedata}`. I created this data set in early 2017 largely for pedagogical purposes like this, allowing students to fit more complex OLS models with a still simple and intuitive application. The topic here is about Donald Trump's share of the vote in the 2016 presidential election for all 51 voting units in the United States (i.e. all 50 states + the District of Columbia). You can find out more information about the data by visiting [this part of the package's website](http://svmiller.com/stevedata/reference/elecction_turnout.html), or with the following command.[^anotherhint]
+This homework will refer to the `election_turnout` data set that is available in `{stevedata}`. I created this data set in early 2017 largely for pedagogical purposes like this, allowing students to fit more complex OLS models with a still simple and intuitive application. The topic here is about Donald Trump's share of the vote in the 2016 presidential election for all 51 voting units in the United States (i.e. all 50 states + the District of Columbia). You can find out more information about the data by visiting [this part of the package's website](http://svmiller.com/stevedata/reference/election_turnout.html), or with the following command.[^anotherhint]
 
 ```r
 ?election_turnout
