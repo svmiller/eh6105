@@ -36,3 +36,8 @@ The first problem set makes use of the [National Epidemiologic Survey on Alcohol
 ### [Problem Set #3](http://eh6105.svmiller.com/problem-sets/3/eh6105-ps3.pdf)
 
 The first problem set makes use of some data available in [`{peacesciencer}`](http://svmiller.com/peacesciencer) to learn bivariate ordinary least squares (OLS) regression.
+
+
+### [Problem Set #4](http://eh6105.svmiller.com/problem-sets/4/eh6105-ps4.pdf)
+
+The first problem set makes use of [some simple (American) presidential election data](http://svmiller.com/stevedata/reference/election_turnout.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about simple derivations of the OLS model (e.g. controls, fixed effects).
