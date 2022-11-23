@@ -1,0 +1,30 @@
+---
+output: stevetemplates::word
+title: "Problem Set #1"
+author: Sven Svensson
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(stevedata)
+```
+
+
+
+1. There are `r n_distinct(SBCD$country)` countries in the `SBCD` data. Here would be the R code to prove that.
+
+```{r}
+n_distinct(SBCD$country)
+
+# Alternatively...
+
+SBCD %>%
+  distinct(country) %>%
+  nrow(.)
+
+```
+
+2. I won't do your homework for you, but I will link you to [a `flygresor.se` jingle](https://www.youtube.com/watch?v=BJj5GoJNREg). Hela Sverige sjunger med! *flyg-, flyg-, flyg, flygresor-punkt-se*!
+
