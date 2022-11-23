@@ -175,7 +175,7 @@ library(stevedata)
 
 # Note: hypothetical data
 Apply <- haven::read_dta("https://stats.idre.ucla.edu/stat/data/ologit.dta")
-# Steve-level (seasonally adjusted) unemployment in the United States.
+# State-level (seasonally adjusted) unemployment in the United States.
 Sunemp <- read_tsv("https://download.bls.gov/pub/time.series/la/la.data.3.AllStatesS") 
 
 # Let's take a look at these data.
