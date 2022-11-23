@@ -28,6 +28,8 @@ This page contains link to lab scripts throughout the semester. Clicking the tit
 
 The first problem set makes use of the [Systemic Banking Crises Database II](http://svmiller.com/stevedata/reference/SBCD.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about basic data summary, data exploration, and data manipulation.
 
+*Answer template*: [`eh6105-ps1-svensson-sven.Rmd`](http://eh6105.svmiller.com/problem-sets/1/eh6105-ps1-svensson-sven.Rmd). Download this file, open it in Rstudio. Press the "Knit" button, and open it in your Word document reader to see what that did.
+
 ### [Problem Set #2](http://eh6105.svmiller.com/problem-sets/2/eh6105-ps2.pdf)
 
 The second problem set makes use of the [National Epidemiologic Survey on Alcohol and Related Conditions (NESARC)](http://svmiller.com/stevedata/reference/nesarc_drinkspd.html) data set in [`{stevedata}`](http://svmiller.com/stevedata) to learn about basic descriptive statistics, recoding things, and, importantly, how you should always read the codebook.
