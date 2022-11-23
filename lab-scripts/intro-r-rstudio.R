@@ -344,6 +344,20 @@ pwt_sample %>%
   # select just what we want for presentation
   select(country:year, rgdpna, rgdpnab)
 
+#' Let's assume we wanted to create a dummy variable for observations in the data starting from the 
+#' Great Recession forward? In other words, let's create a dummy variable for all observations that were in 2008
+#' or later. 
+
+pwt_sample %>%
+  mutate(post_recession = ifelse(year >= 2008, 1, 0))  %>%
+  select(country:year, post_recession)
+
+#' Knowing these data go to 2019, we can do this another way as well.
+
+pwt_sample %>%
+  mutate(post_recession = ifelse(year %in% c(2008:2019), 1, 0)) %>%
+  select(country:year, post_recession)
+
 #' Economists typically care about GDP per capita, right? We can create that kind of data ourselves
 #' based on information that we have in `pwt_sample`.
 
