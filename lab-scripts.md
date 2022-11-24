@@ -30,7 +30,7 @@ This page contains link to lab scripts throughout the semester. Clicking the tit
 <ul id="archive">
 {% for problemsets in site.data.problemsets %}
       <li class="archiveposturl">
-        <span><a href="{{ site.url }}/lab-scripts/{{ problemsets.filename }}.pdf">{{ problemsets.title }}</a></span><br>
+        <span><a href="{{ site.url }}/problem-sets/{{ problemsets.filename }}.pdf">{{ problemsets.title }}</a></span><br>
 <span class = "postlower">
 {{ problemsets.description | markdownify }}</span>
       </li>
