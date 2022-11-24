@@ -13,8 +13,8 @@ This page contains link to lab scripts throughout the semester. Clicking the tit
         <span><a href="{{ site.url }}/lab-scripts/{{ lectures.filename }}.html">{{ lectures.title }}</a></span><br>
 <span class = "postlower">
 <strong>tl;dr:</strong> {{ lectures.tldr }}</span>
-<strong style="font-size:100%; font-family: 'Titillium Web', sans-serif; float:right; padding-right: .5em">
-
+<strong style="font-family: 'Titillium Web', sans-serif; padding-right: .5em">
+<br />
 <a href="https://github.com/{{ site.githubdir}}/tree/master/lab-scripts/{{ lectures.filename}}.R"><i class="fab fa-r-project"></i></a>&nbsp;&nbsp;
 <a href="{{ site.url }}/lab-scripts/{{ lectures.filename }}.html"><i class="fas fa-file-code"></i></a>
 </strong> 
@@ -24,11 +24,23 @@ This page contains link to lab scripts throughout the semester. Clicking the tit
 
 ## Problem Sets
 
+
+*Answer template*: [`eh6105-ps1-svensson-sven.Rmd`](http://eh6105.svmiller.com/problem-sets/1/eh6105-ps1-svensson-sven.Rmd). Download this file, open it in Rstudio. Press the "Knit" button, and open it in your Word document reader to see what that did.
+
+<ul id="archive">
+{% for problemsets in site.data.problemsets %}
+      <li class="archiveposturl">
+        <span><a href="{{ site.url }}/lab-scripts/{{ problemsets.filename }}.html">{{ problemsets.title }}</a></span><br>
+<span class = "postlower">
+{{ problemsets.description | markdownify }}</span>
+      </li>
+{% endfor %}
+</ul>
+<!--
 ### [Problem Set #1](http://eh6105.svmiller.com/problem-sets/1/eh6105-ps1.pdf)
 
 The first problem set makes use of the [Systemic Banking Crises Database II](http://svmiller.com/stevedata/reference/SBCD.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about basic data summary, data exploration, and data manipulation.
 
-*Answer template*: [`eh6105-ps1-svensson-sven.Rmd`](http://eh6105.svmiller.com/problem-sets/1/eh6105-ps1-svensson-sven.Rmd). Download this file, open it in Rstudio. Press the "Knit" button, and open it in your Word document reader to see what that did.
 
 ### [Problem Set #2](http://eh6105.svmiller.com/problem-sets/2/eh6105-ps2.pdf)
 
@@ -47,3 +59,5 @@ The fourth problem set makes use of [some simple (American) presidential electio
 ### [Problem Set #5](http://eh6105.svmiller.com/problem-sets/5/eh6105-ps5.pdf)
 
 The final problem set makes use of [General Social Survey (GSS) data on attitudes about government spending](http://svmiller.com/stevedata/reference/gss_spending.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about OLS model diagnostics. Students will also have the option of bootstrapping their regression model here if they want to go hardcore in the last question. Nothing in the course plan said I couldn't have you choose this path if I wanted.  😜
+
+-->
