@@ -4,7 +4,7 @@ title: Lab Scripts/Problem Sets
 permalink: /lab-scripts-problem-sets/
 ---
 
-This page contains link to lab scripts throughout the semester. Clicking the title of the lab script will go directly to the ["spun"](https://deanattali.com/2015/03/24/knitrs-best-hidden-gem-spin/) HTML document from the underlying R code. The bottom right icons link to the underlying R script (<i class="fab fa-r-project"></i>) and the HTML document (<i class="fas fa-file-code"></i>).
+This page contains link to lab scripts throughout the semester. Clicking the title of the lab script will go directly to the ["spun"](https://deanattali.com/2015/03/24/knitrs-best-hidden-gem-spin/) HTML document from the underlying R code. The bottom left icons link to the underlying R script (<i class="fab fa-r-project"></i>) and the HTML document (<i class="fas fa-file-code"></i>).
 
 
 <ul id="archive">
@@ -24,8 +24,9 @@ This page contains link to lab scripts throughout the semester. Clicking the tit
 
 ## Problem Sets
 
+Here are the five problem sets you'll need to complete through the semester. Observe the deadlines for these problem sets in the syllabus, as they typically coincide with a little over 24 hours from the relevant lab session.
 
-*Answer template*: [`eh6105-ps1-svensson-sven.Rmd`](http://eh6105.svmiller.com/problem-sets/1/eh6105-ps1-svensson-sven.Rmd). Download this file, open it in Rstudio. Press the "Knit" button, and open it in your Word document reader to see what that did.
+I've attached an answer template for your consideration as well. Download this file (i.e. right-click the link and save): [`eh6105-ps1-svensson-sven.Rmd`](http://eh6105.svmiller.com/problem-sets/1/eh6105-ps1-svensson-sven.Rmd). Open it in Rstudio, take a quick look at its contents, and then press the "Knit" button. In the same directory in which you saved the R Markdown file, there'll be a corresponding Word document. Open that in your Word document reader to see what you did. From there, you might be able to follow your intuition as to what's happening. You can [read more about R Markdown here](https://bookdown.org/yihui/rmarkdown).
 
 <ul id="archive">
 {% for problemsets in site.data.problemsets %}

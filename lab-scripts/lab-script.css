@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i');
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans:300,300i,400,400i,600,600i,700,700i');
 @import url('https://fonts.googleapis.com/css?family=Titillium+Web:300,300i,400,400i,600,600i,700,700i'); 
 @import url('https://fonts.googleapis.com/css?family=Fira+Code:400'); 
 
 
 body {
-	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+	font-family: 'Noto Sans', Helvetica, Arial, sans-serif;
 	line-height: 1.5;
 	font-weight: 300;
 	color: #111111;
