@@ -128,10 +128,40 @@ d <- pi # you can assign one built-in object to a new object.
 #' either the `{fixest}` or `{modelr}` package installed. I hope to keep these
 #' situations to a minimum.
 #' 
-#'  My hunch is that if installation of any of these package gives you a headache,
-#' and something terminates without successfully installing, it's probably going to
-#' be for you Mac users. The answer to these headaches is probably "update Xcode".
+#' If any of these result in a "non-zero exit status", that's R's way of saying "I
+#' couldn't install this." For you Mac users, the answer to this situation is *probably*
+#' "update [Xcode](https://developer.apple.com/xcode/)." Xcode is a developer tool suite for Apple,
+#' and many of the `{tidyverse}` packages require access to developmental libraries that, 
+#' to the best of my understanding, are available in Xcode. In all likelihood, you're a first-time
+#' user who has not had to think about software development (and so you haven't updated Xcode since
+#' you first got your Macbook). You might have to do that here.
+#' 
+#' For you Windows users: I think I've figured out what this may look like for you based on my recent
+#' foray into the university's computer labs. The Windows corollary to Xcode is Rtools, which you *don't* have
+#' installed by default (because it's not a Microsoft program, per se). You'll need to install it. 
+#' First, take inventory of what version of R you have (for the university's computer labs, it should be 
+#' 4.0.5). [Go to this website](https://cran.r-project.org/bin/windows/Rtools/) and download the 
+#' version of Rtools that corresponds with the version of R you have. Just click through all the default
+#' options so that it can install. Next, in Rstudio, open a new blank file and copy-paste the following code
+#' into it.
+#' 
+# PATH="${RTOOLS40_HOME}\usr\bin;${PATH}"
 
+#' I'll add the caveat that you should remove the hashtag and space preceding that line.
+#' 
+#' Next, save the file as `.Renviron` in your default working directory, which is probably where you are
+#' if you are using Rstudio for the first time. The save prompt from Rstudio will advise you that this is 
+#' no longer an `.R` file (and, duh, just tell it to save anyway). Afterwards, restart Rstudio and try
+#' again. This *should* fix it, based on my recent trial run in the university's computer labs.
+#' 
+#' For you Linux users: you're awesome, have great hair, everyone likes you, and you don't need to worry about a thing, *except* the various
+#' developmental libraries you may have to install from your package repository. My flavor of Linux
+#' is in the Debian/Ubuntu family, so 
+#' [here's an (incomplete) list of developmental libraries](http://svmiller.com/blog/2019/07/notes-to-self-new-linux-installation-r-ubuntu/) 
+#' based on my experience. Helpfully, most R packages that fail this way will tell you what development library you need,
+#' whether in you're in the Debian or Red Hat family.
+#' 
+#' 
 #' If you have yet to install these packages (and you almost certainly have not if you're opening R for the first time), install it as follows.
 #' Note that I'm just commenting out this command so it doesn't do this when I compile this script on my end. 
 # Take out the comment...
