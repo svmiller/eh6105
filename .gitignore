@@ -10,3 +10,5 @@ _materials/
 !.gitignore
 .jekyll-cache/
 *.log
+
+cache/
