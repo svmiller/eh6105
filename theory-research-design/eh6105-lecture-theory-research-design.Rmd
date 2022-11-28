@@ -1,0 +1,549 @@
+---
+output: 
+  stevetemplates::beamer:
+    latex_engine: xelatex # use xelatex here instead! I recommend it, but this is minimal reprex
+    dev: cairo_pdf # I typically comment this out  if latex_engine: pdflatex
+    slide_level: 3 # I prefer this, but I won't force it on you.
+    theme: metropolis
+title: "(Theory and) Research Design"
+subtitle: EH6105 -- Quantitative Methods
+author: Steven V. Miller
+institute: Department of Economic History and International Relations
+titlegraphic: "`r paste0(Sys.getenv('HOME'), '/Dropbox/stockholm/su-logotyp.png')`"
+titlegraphshift: "\\vspace{6cm}"
+make149: true
+mainfont: "Open Sans Light"
+titlefont: "Titillium Web"
+fontsize: 10pt
+header-includes:
+- \usepackage{dcolumn}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+---
+
+
+
+```{r setup, include=FALSE, cache=F, message=F, warning=F, results="hide"}
+knitr::opts_chunk$set(cache=TRUE, warning=F, message=F, echo=FALSE, fig.width = 14, fig.height = 8.5)
+knitr::opts_chunk$set(fig.path='figs/')
+knitr::opts_chunk$set(cache.path='cache/')
+
+knitr::opts_chunk$set(
+                  fig.process = function(x) {
+                      x2 = sub('-\\d+([.][a-z]+)$', '\\1', x)
+                      if (file.rename(x, x2)) x2 else x
+                      }
+                  )
+```
+
+
+```{r loadstuff, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+options(knitr.kable.NA = '')
+library(tidyverse)
+library(stevemisc)
+library(stevedata)
+# library(peacesciencer)
+# library(fixest)
+library(kableExtra)
+# library(modelsummary)
+library(patchwork)
+library(cowplot); #library(artyfarty)
+
+options("modelsummary_format_numeric_latex" = "plain")
+options(knitr.kable.NA = '')
+```
+
+```{r loaddata, cache=F, eval=T, echo=F, message=F, error=F, warning=F}
+
+tibble(x = c(rep("Left",12), rep("Right", 12)),
+       y = c(rep("Oppose", 7), rep("Favor", 5), 
+             rep("Oppose", 5), rep("Favor", 7)),
+       z = c(rep("Female", 6), rep("Male", 1),
+             rep("Female", 2), rep("Male", 3),
+             rep("Female", 3), rep("Male", 2),
+             rep("Female", 1), rep("Male", 6))) %>%
+  mutate(cat = "Spurious") -> Spurious
+
+tibble(x = c(rep("Left",12), rep("Right", 12)),
+       y = c(rep("Oppose", 7), rep("Favor", 5), 
+             rep("Oppose", 5), rep("Favor", 7)),
+       z = c(rep("Female", 4), rep("Male", 3),
+             rep("Female", 3), rep("Male", 2),
+             rep("Female", 2), rep("Male", 3),
+             rep("Female", 2), rep("Male", 5))) %>%
+  mutate(cat = "Interactive") -> Interactive
+
+tibble(x = c(rep("Left",12), rep("Right", 12)),
+       y = c(rep("Oppose", 6), rep("Favor", 6), 
+             rep("Oppose", 4), rep("Favor", 8)),
+       z = c(rep("Female", 4), rep("Male", 2),
+             rep("Female", 2), rep("Male", 4),
+             rep("Female", 3), rep("Male", 1),
+             rep("Female", 3), rep("Male", 5))) %>%
+  mutate(cat = "Additive") -> Additive
+
+
+```
+
+# Introduction
+### Goal(s) for Today
+
+1. Introduce students to the research process that separates science from non-science.
+2. Emphasize some key components to a quantitative research design.
+
+# Research as Process
+### Research as Process
+
+Scientific research is a process that entails the following.
+
+1. Developing an empirically answerable question.
+2. Deriving a falsifiable hypothesis from a theory purported to answer the question.
+3. Gathering/analyzing data to test the hypothesis.
+4. Rejecting or failing to reject the hypothesis.
+5. Relating results to theory from which the question was drawn.
+
+## Stages of Research
+### Stages of Research
+
+0. Perspective
+1. Causal theory
+2. Hypothesis
+3. Empirical test
+4. Evaluation of hypothesis
+5. Evaluation of causal theory
+6. Advance in scientific knowledge
+
+### Perspective Matters
+
+A perspective is a general orientation to the world. They're untestable because:
+
+1. They're too broad. Empirical support will never be total.
+2. Perspectives are slippery and contextual.
+	- e.g. "People are rational."
+3. Any empirical data observed can be interpreted to fit the perspective.
+
+We start with perspectives because we're not blank slates.
+
+<!-- - Rationality, for example, informs our general theories and the data-collection process. -->
+
+### What is a Theory?
+
+Theories follow perspectives.
+
+- They're systematic purported explanations of how the "world" (or part of it that interests the researcher) operates.
+
+Theories are too abstract to be tested.
+
+- However, they lend themselves to operationalizations of the theory's concepts.
+- We end up testing the theory's predictions (or hypotheses).
+
+### Hypotheses
+	
+Hypotheses are the *falsifiable* statements.
+
+- i.e. they are able to be "proven wrong".
+- They also entail a means of operationalization (i.e. variables).
+	
+### Knowledge Accumulation
+
+Results from empirical tests add to (or even refute) standing scientific knowledge.
+
+- Copernicus: *On Revolutions of the Heavenly Spheres*.
+- Lazersfeld et al. (1944): *The People's Choice*.
+
+Empirical tests can culminate in **paradigm shifts**, leading to new research agendas.
+
+<!-- - The "first principle of wing-walking" is a metaphor for when we should jettison research paradigms in favor of new ones. -->
+	
+### Summary of the Research Process
+
+There are different norms across different social sciences.
+
+<!-- - Sociology may have a bigger emphasis on grand theorizing. -->
+- Political science is mostly "mid-range", focusing on strategic constraints and instrumental rationality.
+- Even within IR, you can still get a heavy dose of grand theorizing if you want it.
+
+
+	
+Perhaps political science looks more like: puzzle -> research question -> theory -> hypotheses -> analysis.
+
+## The Relationship between Research and Proof
+### Research Does Not Prove
+
+The research process is (mostly) a deductive exercise.
+
+- Each stage is a consequence of the previous stage *except* for the analysis phase.
+- Therein, results are compared "up" to the hypothesis to check for consistency.
+
+As a result, we can't prove theories true.
+
+- At the most, we say our findings are consistent with the theory.
+
+### Affirming the Consequent
+
+Generally, our hypotheses look like forms of an argument or syllogism.
+
+- If my theory is valid (A), my predictions about the data will be correct (B).
+- If we observe B, we cannot prove A.
+
+### Affirming the Consequent
+
+Take a simple logical example: if Zlatan Ibrahimović wins the lottery (A), he will be rich (B).
+
+- The Zlatan is rich (B).
+- Therefore, The Zlatan won the lottery (A).
+
+We know this is not true.
+
+- i.e. The Zlatan is rich for he is The Zlatan.
+
+### Denying the Consequent
+
+Research can't prove a theory true, but it can disprove one.
+
+- i.e. if A, then B. Not-B. Therefore, Not-A.
+
+Take a simple logical example.
+
+- If I get thrown off the Eiffel Tower (A), I will die (B).
+- I am not dead (~B).
+- Therefore I've not been thrown off the Eiffel Tower (yet) (~A).
+
+If the data don't support the hypothesis, you can reject all or part of the theory.
+
+### Hypothetico-Deductivism (H-D), in a Nutshell
+
+You may see this kind of process called "hypothetico-deductivism" (e.g. Hausman, 1990).
+
+1. Formulate some hypothesis *H* from theory *T*.
+2. Deduce prediction *P* from *H* with necessary qualifiers (e.g. “ceteris paribus”).
+3. Test *P*.
+4. Judge whether H is confirmed or disconfirmed, contingent on *P* or *~P*.
+
+## Emphasis and Caveats
+### Emphasis and Caveats
+
+- Good theories are akin to an extended syllogism; make your assumptions clear.
+- Think of theory as like an extended syllogism.
+    - If I accept the assumptions, I accept setting up the theory for an empirical test.
+- Falsificationism is key; it's what distinguishes science from non-science.
+- Mostly a juxtaposition to inference by induction.
+- Even then: there's an inductive component here (the hypothesis evaluation).
+- *"Facts" don't speak for themselves.*
+    - Notice we said nothing about how we "test *P*".
+- *Everything is a model*; all science is necessary simplification.
+    - This is true for both theory and method.
+
+
+# Research Design
+### Quantitative Research Design
+
+Basic takeaways:
+
+1. "Concepts" and measures
+2. *X*, *Y*, and *Z*
+3. Data as spreadsheet
+
+## Concepts and Measures
+### Concepts and Measures
+
+The research questions you ask may look something like this:
+
+- How is the U.S. more "powerful" than Russia?
+- Why is Europe "richer" than less-developed countries?
+- Why is American politics beset with problems of “polarization” and “partisanship?”
+- Why have "democracies" never fought a "war" with each other?
+
+These are just examples, and notice I could've put scare quotes too on a few other things (e.g. "less-developed countries").
+
+### Concepts and Measures
+
+*Every discussion about politics you have is conceptual*.
+
+- Concepts are ideas of mental constructs that represent phenomena in the real world.
+- Some are simple (e.g. American partisanship). Some are complicated (e.g. corruption).
+
+Concepts intuitively vary among units in the real world.
+
+- Sweden is "richer" than Burundi.
+- The U.S. is more “powerful” than Luxembourg.
+- Kazakhstan is more “corrupt” than Norway.
+- Botswana is more "democratic" than Angola.
+
+### Concepts and Measures
+
+You want **measures** of these concepts.
+
+- e.g. a war is typically measured as any conflict with a 1,000 or more battle-related deaths.
+
+We seek to devise the best measure that best captures the “true” concept.
+
+- However, there’s always some slippage between concept and measure.
+- We do our best to eliminate as much error as we can.
+
+### Evaluating Measures
+
+- Systematic and random measurement error
+- Validity and reliability
+
+### Systematic Measurement Error
+
+Systematic measurement error is the bigger concern of the two.
+
+- It can confound inference.
+
+This was a big problem in the literature on (American) political tolerance.
+
+- *Concept*: the extent to which individuals express a willingness to "put up with" political attitudes or behavior they find objectionable.
+- *Measure*: would you allow a communist or atheist to make a speech in your community/run for office?
+
+	- Individuals that allow this are conceived to be "politically tolerant".
+	
+### Were Americans Becoming More Tolerant?
+
+![Scenes from the Tenth Communist Party USA convention in Chicago (May 1938)](1938-05-27-communist-party-usa-convention.png)
+
+By the early 1980s, Americans looked to be much more tolerant than they were in the 1950s. Why?
+
+	
+### What Was the Problem?
+
+*Answer*: they weren't. Our measure of "political tolerance" was flawed.
+
+- By inserting "least-liked groups", we biased our measure off what we wanted.
+- We were measuring ideology, religious values, or variable fear of the USSR in the Cold War, not just "political tolerance".
+
+When we allow individuals to name their least-liked group, Americans are still as politically intolerant as they had ever been.
+
+## X, Y, and Z
+### X, Y, and Z
+
+Measures are variables and variables vary.
+
+- We'll discuss levels of measurement in the next lecture.
+
+Generally, our variables of interest are a class of *X*, *Y*, and *Z*.
+
+- *X*: the *independent* variable(s); the "cause" of an effect.
+- *Y*: the *dependent* variables(s); the outcome or effect of the cause.
+- *Z*: the *control* variables; everything that can mitigate the relationship between *X* and *Y*.
+
+
+### The Three Types of Relationships Among X, Y, and Z
+
+Spurious
+
+- There is no effect of *X* on *Y*, controlling for *Z*.
+
+Interactive
+
+- The effect of *X* on *Y* depends on the value of *Z*.
+
+Additive
+
+- *X* and *Z* both independently affect *Y*.
+
+### Illustrating These Relationships
+
+Assume this simple set up.
+
+- We are interested in support (*Y*) for some deregulation issue.
+- We believe party support (*X*) explains whether a respondent favors or opposes the issue.
+- We also want to control for the gender (*Z*) of the respondent.
+- We have 24 respondents where we have asked about their party support, policy support, and gender.
+
+Our data look something like this.
+
+###
+
+```{r}
+Spurious %>%
+  select(-cat) %>%
+  group_split(x) -> hold_this
+
+hold_this[[1]] %>%
+  bind_cols(., hold_this[[2]]) %>%
+  kbl(.,
+      col.names = c("Party (X)", "Support (Y)", "Gender (Z)",
+                    "Party (X)", "Support (Y)", "Gender (Z)"),
+      align = c("cccccc"),
+      booktabs = TRUE, longtable = TRUE,linesep = '',
+      caption = "A Toy Data Set on Support for Some Policy (Y), by Party Support (X) and Gender (Z) ") %>%
+  row_spec(0, bold=TRUE) %>%
+  kable_styling(font_size = 9) %>%
+  footnote(general = "24 total respondents cast across 12 rows for sake of presentation.")
+```
+
+### A Spurious Relationship Among X, Y, and Z
+
+We find prima facie support for the effect of *X* on *Y*.
+
+- 41.67% of Left party supporters favor the proposal.
+- 58.33% of Right party supporters favor the proposal.
+
+However, there is a major **compositional difference** in the parties, by gender.
+
+- 67% of the Left party are women, compared to 33% of the Right party.
+
+Indeed, this simple example suggests that "controlling" for gender (*Z*) means there's no independent effect of party support (*X*) on support for deregulation (*Y*).
+
+###
+
+```{r}
+Spurious %>%
+  group_by(x, z) %>%
+  count(y) %>%
+  mutate(tot = sum(n)) %>%
+  mutate(perc = n/tot) %>%
+  mutate(x_num = ifelse(x == "L", 0, 1)) %>%
+  filter(y == "Favor") %>%
+  arrange(x) %>% ungroup() %>%
+  ggplot(.,aes(x, perc, color=z, group=z)) +
+  theme_steve_web() +
+  geom_point() + geom_line(size=1.1) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1),
+                     breaks = seq(0, 1, by=.1)) +
+  labs(x = "Party Support (X)", y = "Percent Supporting the Issue (Y)",
+       color = "",
+       title = "A Spurious Relationship Between X and Y, Controlling for Z",
+       subtitle = "In our simple example, the differences in support are a function of the compositional differences of X by Z.")
+
+```
+
+
+###
+
+```{r}
+Spurious %>%
+  group_by(x, z) %>%
+  count(y) %>%
+  mutate(tot = sum(n)) %>%
+  mutate(perc = n/tot) %>%
+  mutate(x_num = ifelse(x == "L", 0, 1)) %>%
+  filter(y == "Favor") %>%
+  arrange(x) %>% ungroup() %>%
+  mutate(cat = "Spurious") -> d0
+
+Additive %>%
+  group_by(x, z) %>%
+  count(y) %>%
+  mutate(tot = sum(n)) %>%
+  mutate(perc = n/tot) %>%
+  mutate(x_num = ifelse(x == "L", 0, 1)) %>%
+  filter(y == "Favor") %>%
+  arrange(x) %>% ungroup() %>%
+  mutate(cat = "Additive") -> d1
+
+Interactive %>%
+  group_by(x, z) %>%
+  count(y) %>%
+  mutate(tot = sum(n)) %>%
+  mutate(perc = n/tot) %>%
+  mutate(x_num = ifelse(x == "L", 0, 1)) %>%
+  filter(y == "Favor") %>%
+  arrange(x) %>% ungroup() %>%
+  mutate(cat = "Interactive") -> d2
+
+bind_rows(d0, d1, d2) %>%
+  ggplot(.,aes(x, perc, color=z, group=z)) +
+  theme_steve_web() +
+  facet_wrap(~cat) +
+  geom_point() + geom_line(size=1.1) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1),
+                     breaks = seq(0, 1, by=.1)) +
+  labs(x = "Party Support (X)", y = "Percent Supporting the Issue (Y)",
+       color = "",
+       title = "The Three Types of Controlled Relationships, Visualized",
+       subtitle = "If you're arguing for the effect of X on Y, the spurious relationship is the most disappointing to get from an analysis.")
+
+```
+
+### Research Design and Control
+
+Any honest research design needs to "control" for confounding effects of *X* on *Y*.
+
+- It's up to you to determine what exactly is (or are) *Z*.
+
+Experimental designs typically get around this through **random assignment**.
+
+- Everything else requires more work.
+
+## Quantitative Data as Spreadsheet
+### Quantitative Data as Spreadsheet
+
+If it helps, think of the "data set" as a spreadsheet.
+
+- Rows: Observations/units of analysis
+- Columns: variables across all units
+
+Often you'll get a variable heading (i.e. column name) that is oblique code/label.
+
+- i.e. in the next table, `hinctnta` is an indicator of a respondent's household income, in deciles.
+- Put in other words: never lose sight of your codebook.
+
+
+### An Example Data Set
+
+```{r}
+ESS9GB %>%
+  select(idno, region, immigsent:lrscale) %>%
+  head(10) %>%
+  kbl(., caption = "A Sample of 10 British Respondents in the European Social Survey (2018)",
+      linesep = '', longtable = T, booktabs = T,
+      align = c("clcccccc")) %>%
+  row_spec(0, bold=TRUE) %>%
+  kable_styling(font_size = 8) %>%
+  footnote(general = "Data: European Social Survey v. 9 [edition: 1.2]. Interviews done end of 2018/start of 2019.")
+```
+
+### What is a Unit of Analysis?
+
+A "unit of analysis" is the type of observation under study. Common types you'll find:
+
+- Individuals (e.g. survey data)
+- Individuals over time (common in health studies)
+- Geographical units (e.g. counties, regions, sovereign states)
+- Geographical units over time (e.g. most economic data you'll find)
+- Dyads [over time] (e.g. inter-state conflict data)
+
+Always keep track of your unit of analysis too.
+
+- Beware of the ecological fallacy.
+
+
+# Conclusion
+### Conclusion
+
+Theory, hypothesis, and the scientific enterprise: 
+
+- Communicate your assumptions; acknowledge your perspectives.
+- Science if simplification, and falsification.
+- Theory *and* method have assumptions we make and accept/reject.
+- Most research does not *prove*; you're checking for consistency.
+
+Quantitative research design:
+
+- Everything is a "concept"; you're trying to measure it (well).
+- Assessing the effect of *X* on *Y* means controlling for *Z*.
+- Think of the data set as just a big ol' spreadsheet.
+
+<!-- ### Hawthorne Effect -->
+
+<!-- The **Hawthorne effect** is related to systematic measurement error. -->
+
+<!-- - It's the phenomenon when individuals change their behavior when they know they're being monitored. -->
+
+<!-- Examples in political science. -->
+
+<!-- - Subjects in non-democratic countries are less likely to disclose true attitudes about the government. -->
+<!-- - Americans tell survey researchers they vote when they often do not. -->
+<!-- - Western Europeans tend to withhold racist statements to survey researchers. -->
