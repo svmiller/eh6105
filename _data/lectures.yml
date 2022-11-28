@@ -2,6 +2,11 @@
   filename: introduction
   dirname: introduction
   tldr: "An introduction to the course. Install R and Rstudio."
+  
+- title: "(Theory and) Research Design"
+  filename: theory-research-design
+  dirname: theory-research-design
+  tldr: "Research is a process that does not 'prove.' Theories are evaluated for (in)consistency with predictions. Everything has assumptions. Think of the quantitative research design as you would a spreadsheet."
 
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
