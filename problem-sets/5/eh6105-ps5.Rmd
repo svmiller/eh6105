@@ -44,8 +44,8 @@ Answer these questions. A successful answer of these question must include the R
 2. Run an OLS model that regresses the `sumnatsoc` variable on the respondent's age, sex, years of education, their ideology ("political views"), the dummy variable for black respondents you created, and the adjusted partisanship variable you also created (or otherwise modified from the original data). Explain the results to me.[^protip]
 3. Let's check for the linearity of the model. Run the `linloess_plot()` function from `{stevemisc}` on the regression model you ran and tell me if you think there is evident of non-linearity in the model.[^car] Explain your answer. Tell me what you see.
 4. Run a Durbin-Watson test and Breusch-Godfrey test for autocorrelation from this model and tell me what you find.
-5. (2 POINTS) Let's check for potential heteroskedasticity in the regression model. Run two different diagnostics for detecting potential heteroskedasticity in the regression model and tell me what you find. Is there evidence of heteroskedasticity in the regression model?
-6. (2 POINTS) Run a weighted least squares version of this regression model and compare the results to regular OLS. What differences do you see?
+5. Let's check for potential heteroskedasticity in the regression model. Run two different diagnostics for detecting potential heteroskedasticity in the regression model and tell me what you find. Is there evidence of heteroskedasticity in the regression model?
+6. Run a weighted least squares version of this regression model and compare the results to regular OLS. What differences do you see?
 7. (2 POINTS) Run one other heteroskedasticity correction and report the results back to me. You can either use the functionality included in `{fixest}` (the easier option, perhaps), or you can go hardcore with the bootstrapping approach. You'll want the `{modelr}` approach for that.
 
 [^car]: `{car}` has a wonderful `residualPlots()` function that includes a Tukey test for non-additivity. You may want to check that out too.
