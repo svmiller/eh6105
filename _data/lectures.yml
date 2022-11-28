@@ -1,3 +1,8 @@
+- title: "Introduction"
+  filename: introduction
+  dirname: introduction
+  tldr: "An introduction to the course. Install R and Rstudio."
+
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
 # #  dirname: untitled-lecture
