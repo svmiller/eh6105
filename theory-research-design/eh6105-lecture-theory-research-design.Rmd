@@ -232,8 +232,10 @@ You may see this kind of process called "hypothetico-deductivism" (e.g. Hausman,
 ## Emphasis and Caveats
 ### Emphasis and Caveats
 
-- Good theories are akin to an extended syllogism; make your assumptions clear.
+<!-- - Good theories are akin to an extended syllogism; make your assumptions clear. -->
+
 - Think of theory as like an extended syllogism.
+    - Make your assumptions clear.
     - If I accept the assumptions, I accept setting up the theory for an empirical test.
 - Falsificationism is key; it's what distinguishes science from non-science.
 - Mostly a juxtaposition to inference by induction.
