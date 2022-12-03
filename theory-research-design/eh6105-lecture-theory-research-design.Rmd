@@ -528,7 +528,7 @@ Always keep track of your unit of analysis too.
 Theory, hypothesis, and the scientific enterprise: 
 
 - Communicate your assumptions; acknowledge your perspectives.
-- Science if simplification, and falsification.
+- Science is simplification, and falsification.
 - Theory *and* method have assumptions we make and accept/reject.
 - Most research does not *prove*; you're checking for consistency.
 
