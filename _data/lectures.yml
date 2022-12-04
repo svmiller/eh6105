@@ -8,6 +8,12 @@
   dirname: theory-research-design
   tldr: "Research is a process that does not 'prove.' Theories are evaluated for (in)consistency with predictions. Everything has assumptions. Think of the quantitative research design as you would a spreadsheet."
 
+- title: "Descriptive Statistics"
+  filename: descriptive-statistics
+  dirname: descriptive-statistics
+  tldr: "Understanding the kind of information your variable communicates will condition how you can describe them, and never trust a summary statistic of a variable (or two variables) without looking at them first."
+
+
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
 # #  dirname: untitled-lecture
