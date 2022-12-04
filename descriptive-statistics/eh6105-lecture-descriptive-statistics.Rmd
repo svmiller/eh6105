@@ -1,0 +1,724 @@
+---
+output: 
+  stevetemplates::beamer:
+    latex_engine: xelatex # use xelatex here instead! I recommend it, but this is minimal reprex
+    dev: cairo_pdf # I typically comment this out  if latex_engine: pdflatex
+    slide_level: 3 # I prefer this, but I won't force it on you.
+    theme: metropolis
+title: "Basic Descriptive Statistics"
+subtitle: EH6105 -- Quantitative Methods
+author: Steven V. Miller
+institute: Department of Economic History and International Relations
+titlegraphic: "`r paste0(Sys.getenv('HOME'), '/Dropbox/stockholm/su-logotyp.png')`"
+titlegraphshift: "\\vspace{6cm}"
+make149: true
+mainfont: "Open Sans Light"
+titlefont: "Titillium Web"
+fontsize: 10pt
+header-includes:
+- \usepackage{dcolumn}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+---
+
+
+
+```{r setup, include=FALSE, cache=F, message=F, warning=F, results="hide"}
+knitr::opts_chunk$set(cache=TRUE, warning=F, message=F, echo=FALSE, fig.width = 14, fig.height = 8.5)
+knitr::opts_chunk$set(fig.path='figs/')
+knitr::opts_chunk$set(cache.path='cache/')
+
+knitr::opts_chunk$set(
+                  fig.process = function(x) {
+                      x2 = sub('-\\d+([.][a-z]+)$', '\\1', x)
+                      if (file.rename(x, x2)) x2 else x
+                      }
+                  )
+```
+
+
+```{r loadstuff, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+options(knitr.kable.NA = '')
+library(tidyverse)
+library(stevemisc)
+# library(peacesciencer)
+# library(fixest)
+library(kableExtra)
+# library(modelsummary)
+library(patchwork)
+library(cowplot); #library(artyfarty)
+
+options("modelsummary_format_numeric_latex" = "plain")
+options(knitr.kable.NA = '')
+```
+
+```{r loaddata, cache=F, eval=T, echo=F, message=F, error=F, warning=F}
+ESS9 <- haven::read_sav("/home/steve/Dropbox/data/ess/9/ESS9e03_1.sav")
+
+
+ESS9 %>% 
+  filter(cntry == "SE") %>%
+  select(dweight:nwspol, netustm, netusoft, prtclcse, prtdgcl, lrscale, stfdem, atchctr, atcherp,
+         imbgeco, imueclt, imwbcnt, rlgatnd, pray,
+         freehms, hmsfmlsh, hmsacld,
+         agea, gndr, eduyrs, region, hinctnta, uempla,
+         inwdds:inwemm) %>%
+  mutate(immigsent = imbgeco + imueclt + imwbcnt) -> Sweden
+
+
+library(stevedata)
+# read_csv("/home/steve/Downloads/2022.csv") %>% 
+#   mutate(county = case_when(
+#     constitutency %in% c(1, 2) ~ "Stockholm",
+#     constitutency %in% c(3) ~ "Uppsala",
+#     constitutency == 4 ~ "Södermanland",
+#     constitutency == 5 ~ "Östergötland",
+#     constitutency == 6 ~ "Jönköping",
+#     constitutency == 7 ~ "Kronoberg",
+#     constitutency == 8 ~ "Kalmar",
+#     constitutency == 9 ~ "Gotland",
+#     constitutency == 10 ~ "Blekinge"
+#   )) %>%
+#   filter(county == "Stockholm") %>%
+#   group_by(statistic) %>%
+#   summarize(number = sum(number))
+
+
+readxl::read_excel("/home/steve/Downloads/roster-per-distrikt-slutligt-antal-roster-inklusive-totalt-valdeltagande-regionval-2022.xlsx", sheet = 2) %>%
+  rename(lan = 3,
+         vote = 11) %>%
+  group_by(lan, Parti) %>%
+  summarize(n = sum(vote)) %>%
+  ungroup() -> Ass
+
+Ass %>%
+  ungroup() %>%
+  filter(Parti == "Summa giltiga röster") %>%
+  rename(valid_votes = n) %>%
+  select(lan, valid_votes) %>%
+  left_join(Ass, .) %>%
+  mutate(perc = n/valid_votes) %>%
+  mutate(party = case_when(
+    Parti == "Arbetarepartiet-Socialdemokraterna" ~ "Socialdemokraterna",
+    Parti == "Centerpartiet" ~ "Centerpartiet",
+    Parti == "Liberalerna (tidigare Folkpartiet)" ~ "Liberalerna",
+    Parti == "Miljöpartiet de gröna" ~ "Miljöpartiet de gröna",
+    Parti == "Moderaterna" ~ "Moderaterna",
+    Parti == "Sverigedemokraterna" ~ "Sverigedemokraterna",
+    Parti == "Vänsterpartiet" ~ "Vänsterpartiet",
+    Parti == "Kristdemokraterna" ~ "Kristdemokraterna"
+  )) %>% 
+  #distinct(lan) %>%
+  rename(county = lan) %>%
+  left_join(., sweden_counties) -> Ass
+
+library(qs)
+USA <- qread("~/Dropbox/data/wvs/wvs6wave-20180912.qs") %>% rename_all(tolower) %>%
+  filter(s003 == 840)
+USA %>% filter(s002 == 5) %>%
+    select(s020, x047cs) %>%
+    mutate(inccat = x047cs - 840040) -> USA2006
+```
+
+# Introduction
+### Goal(s) for Today
+
+1. Define basic levels of measurement, or how you should think about them.
+2. Discuss basic descriptive statistics (i.e. central tendency and dispersion).
+3. Do some preliminary bivariate analysis.
+
+
+### Levels of Measurement
+
+The classic typology, a la Stanley Smith.
+
+1. Nominal
+2. Ordinal
+3. Interval
+4. Ratio
+
+
+### My Preferred Derivation of this Framework
+
+
+1. Does it have just two values?
+2. Does an arithmetic mean ("average") make sense?
+
+
+### Dummy Variables
+
+
+A variable with just two values is called a **dummy variable**.
+
+- Some type of phenomenon is either present or absent.
+- A statistical analysis will typically impose 0s and 1s on these variables, even if you see names/labels.
+
+Gender is the most common and intuitive dummy variables.
+
+- We typically code women as 1, men as 0.
+
+We don't try to explain variations in gender (seriously, don't), but gender may explain phenomena of interest.
+
+- e.g. support for parental leave policies in Europe, support for contraceptive coverage in the U.S.
+
+
+### Does an Arithmetic Mean Make Sense?
+
+...especially if it had decimals? If no:
+
+- Nominal ("unordered-categorical")
+- Ordinal ("ordered-categorical")
+- Both have a finite set of values that can occur.
+
+If yes, you can call it "continuous".
+
+- Counts, integers, percentages, proportions, ratio, real numbers, to name a few.
+- All these are much more granular, have far more possible values.
+
+### Nominal Variables
+
+A **nominal variable** has the lowest level of precision.
+
+- The numeric values in these variables code differences *and nothing else*.
+
+### Nominal Variables
+
+What does this mean? Take gender, for example.
+
+- i.e. women = 1 and men = 0.
+- We need to substitute these numeric values for labels in order to do any statistical analysis.
+
+Numerically, we know 1 > 0.
+
+- That does not mean we are saying that women are "better" than men.
+
+We are not saying that 1 > 0, but that 1 != (i.e. does not equal) 0.
+
+- All binary variables are, by design, nominal variables.
+
+### Nominal Variables
+
+There are other examples of nominal variables with plenty of different values. Examples:
+
+- County of origin (e.g. Stockholm, Västerbotten, Norrbotten..)
+- Country of Origin (e.g. USA, Canada, Bahamas...)
+- Race (e.g. white, black, etc...)
+- Religion (e.g. Protestant, Catholic, Muslim, etc...)
+- Party vote choice (e.g. Vänsterpartiet, Socialdemokraterna, etc...)
+
+Again, values in these variables simply code differences.
+
+### Ordinal Variables
+
+**Ordinal variables** capture rank, or order, within the numeric values.
+
+- They often (but do not always) look like Likert items.
+
+Likert items make a statement and prompt a level of agreement with the statement.
+
+- e.g. "[I would be] ashamed if close family member gay or lesbian"
+- Answers: Strongly agree, agree, neutral, disagree, strongly disagree.
+- Corresponding values: 1, 2, 3, 4, 5
+    
+Since the variable captures degree of (dis)agreement, we can say that 2>1 and 5>2.
+
+- An ordinal variable captures order and rank, but only captures *relative* difference.
+
+<!-- ### Ordinal Variables -->
+
+<!-- Since the variable captures degree of agreement, we can say that 2>1 and 1>-2. -->
+
+<!-- - People who respond "agree" are more in agreement with the statement than those who "strongly disagree". -->
+<!-- - However, this variable does not precisely say much. -->
+
+<!-- An ordinal variable captures order and rank, but only captures *relative* difference. -->
+
+### "Continuous" Variables
+
+"Continuous" variables captures *exact* differences.
+
+- It's our most precise level of measurement.
+
+Perhaps the most common continuous measure we observe is age in years.
+
+- i.e. someone who is 34 is 13 years older than someone who is 21.
+- Notice the difference is no longer relative, but exact and precise.
+
+Age is an easy way of thinking of continuous variables, but we have others too.
+
+- Political economy researchers have a glut of continuous variables.
+- e.g. gross national income, GDP per capita, kilowatt hours consumed per capita, consumer price index.
+
+### What's the Cutoff?
+
+The difference between ordinal and continuous is mostly intuitive, but there is a gray area sometimes.
+
+- Do we know if a guy who earns $50,001 is exactly one dollar richer than a guy who makes $50k even?
+	- We may have an issue of cents.
+- Is the person who is 21 exactly one year older than a 20-year-old?
+	- We may have an issue of days and months.
+
+How would you know when it's ordinal or continuous?
+
+### A Rule of Thumb
+
+We love to treat technically ordinal variables as continuous when we can.
+
+- Especially true for age and income.
+
+Ask yourselves two questions.
+
+1. How many different values are there?
+2. How are the data distributed?
+
+### A Rule of Thumb
+
+If it has seven or more different values, you can *start* to think of it as continuous.
+
+- e.g. financial satisfaction on a 10-point scale.
+- e.g. justifiability of bribe-taking on a 10-point scale.
+
+However, check to see how the data are distributed.
+
+- Is it bimodal? Is there a noticeable skew?
+- If so, *resist the urge* to treat it as contiunous.
+
+
+### 
+
+```{r wvs-usa-financial-satisfaction-2006, echo=F, eval=T, fig.width = 14, fig.height = 8.5, warning = F, message = F}
+USA %>% select(s020, c006) %>% 
+  haven::zap_labels(.) %>%
+  group_by(s020) %>%
+  count(c006) %>% filter(s020 == 2006) %>% na.omit %>%
+  ggplot(.,aes(as.factor(c006), n)) +
+  theme_steve_web() +
+  geom_bar(stat="identity", fill="#619cff", alpha=.8,color="black")  +
+  geom_text(aes(label=n), color="black",
+            position=position_dodge(width=.9), 
+            size=4, vjust = -.5, family="Open Sans") +
+  scale_x_discrete(labels =c("Dissatisfied", "2", "3", "4","5","6","7",
+                             "8","9", "Satisfied")) +
+  labs(title = "The Distribution of Financial Satisfaction in the U.S. in 2006",
+       y = "Number of Observations", x = "Financial Satifaction",
+       caption = "Data: World Values Survey (United States, 2006)",
+       subtitle = "Data are limited to a 1-10 scale, but are sufficiently spaced out with no heaping. You could treat this as continuous for convenience.")
+```
+
+
+###
+
+```{r british-immigration-sentiment-2018, echo=F, eval=T, fig.width = 14, fig.height = 8.5, warning = F, message = F}
+ESS9GB %>%
+  group_by(immigsent) %>% # group_by unique values of immigsent
+  summarize(n = n()) %>% # return number of times that particular value was coded for variable
+  na.omit %>% # drop NAs, which won't matter much here.
+  ggplot(.,aes(as.factor(immigsent), n)) +  # create foundation ggplot
+  # bar chart, with some prettiness
+  geom_bar(stat="identity", alpha=0.8, color="black", fill="#619cff") +
+  geom_text(aes(label=n), color="black",
+            position=position_dodge(width=.9), 
+            size=3.5, vjust = -.5, family="Open Sans") +
+  theme_steve_web() + 
+  labs(y = "Number of Observations",
+       x = "Value of the Pro-Immigration Sentiment Variable",
+       caption = "Data: European Social Survey, Round 9 in the United Kingdom\nBlog post: http://svmiller.com/blog/2020/03/what-explains-british-attitudes-toward-immigration-a-pedagogical-example/",
+       title = "A Bar Chart of Pro-Immigration Sentiment in the United Kingdom from the ESS Data (Round 9)",
+       subtitle = "There's a natural heaping of 0s and 30s but I've seen worse variables treated as continuous for an OLS model or summarized by means.")
+```
+
+
+### 
+
+```{r wvs-usa-justif-bribe, echo=F, eval=T, fig.width = 14, fig.height = 8.5, warning = F, message = F}
+USA %>% select(s020, f117) %>% 
+  haven::zap_labels(.) %>%
+  group_by(s020) %>%
+  count(f117) %>% na.omit %>%
+  group_by(s020) %>%
+  mutate(perc = n/sum(n),
+         lab = paste0(round(perc*100, 1), "%")) %>%
+  ggplot(.,aes(as.factor(f117), perc)) +
+  facet_wrap(~s020) +
+  theme_steve_web() +
+  geom_bar(stat="identity", fill="#619cff", alpha=.8,color="black")  +
+  geom_text(aes(label=lab), color="black",
+            position=position_dodge(width=.9), 
+            size=3.5, vjust = -.5, family="Open Sans") +
+  scale_x_discrete(labels =c("Never\nJustifiable", "2", "3", "4","5","6","7",
+                             "8","9", "Always\nJustifiable")) +
+  scale_y_continuous(labels=scales::percent,limits = c(0,.9)) +
+  labs(title = "The Justifiability of Taking a Bribe in the United States, 1981-2011",
+       y = "Percentage of Responses", x = "Justifiability of Taking a Bribe",
+       caption = "Data: World Values Survey (United States, 1981-2011)",
+       subtitle = "There is a clear right skew with a natural heaping at 0. *Don't* treat this as continuous and don't ask for a mean of it.")
+```
+
+### 
+
+```{r wvs-usa-justif-abortion, echo=F, eval=T, fig.width = 14, fig.height = 8.5, warning = F, message = F}
+USA %>% select(s020, f120) %>% 
+  haven::zap_labels(.) %>%
+  group_by(s020) %>%
+  count(f120) %>% na.omit %>%
+  group_by(s020) %>%
+  mutate(perc = n/sum(n),
+         lab = paste0(round(perc*100, 1), "%")) %>%
+  ggplot(.,aes(as.factor(f120), perc)) +
+  facet_wrap(~s020) +
+  theme_steve_web() +
+  geom_bar(stat="identity", fill="#619cff", alpha=.8,color="black")  +
+  geom_text(aes(label=lab), color="black",
+            position=position_dodge(width=.9), 
+            size=4, vjust = -.5, family="Open Sans") +
+  scale_y_continuous(limits = c(0,.5)) +
+  scale_x_discrete(labels =c("Never\nJustifiable", "2", "3", "4","5","6","7",
+                             "8","9", "Always\nJustifiable")) +
+  labs(title = "The Justifiability of an Abortion in the United States, 1981-2011",
+       y = "Percentage of Responses", x = "Justifiability of an Abortion",
+       caption = "Data: World Values Survey (United States, 1981-2011)",
+       subtitle = "You're observing clear clumping/heaping in these data for which an ''average'' wouldn't look so average.")
+```
+
+
+### Condensing Continuous to Nominal
+
+You can always condense a measure to lower levels of precision, but cannot add levels of precision. Take income, for example.
+
+- **Continuous**: income in dollars.
+    - This will likely have a right skew, though.
+- **Ordinal**: 0-$25k, $25k-$50k, $50k-$75k, $75k-$100k, $100k and above
+- **Nominal**: low income earners (i.e. < $25k) and not low income earners.
+
+# Central Tendency and Dispersion
+### Central Tendency
+
+
+Correct classification will condition how we can *describe* variables.
+
+- Mode: most commonly occurring value
+- Median: middlemost value
+- Mean: arithmetic average
+
+Think of what follows as a "tool kit" for researchers.
+
+- More precise variables allow for more precise measures.
+- Use the right tool for the job, if you will.
+
+
+### Mode
+
+The **mode** is the most basic central tendency statistic.
+
+- It identifies the most frequently occurring value.
+
+These statistics may be dissatisfying because they don't tell you much.
+
+- Then again, your data aren't telling you much.
+
+Basic inferential takeaway: absent any other information, no other guess about an unordered-categorical variable would be as good, on average, as the mode.
+
+
+### Median
+
+The **median** is the middlemost value.
+
+- It's the most precise statistic for ordinal variables.
+- It's a useful robustness check for continuous variables too.
+
+Order the observations from lowest to highest and find what value lies in the exact middle.
+
+- The median is the point where half the values lie below and half are above.
+    - For an even number of observations, take the two that straddle the middle and get the midway point of those two.
+- We can do this when our variables have some kind of "order".
+- Medians of nominal variables are nonsensical.
+
+
+### Mean
+
+The arithmetic **mean** is used only for continuous variables.
+
+- This is to what we refer when we say "average".
+
+Formally, *i* through *n*:
+
+\begin{equation}
+	\frac{1}{n}\Sigma x_i
+\end{equation}
+
+We can always describe continuous variables with the median.
+
+- We cannot do the same for ordinal or nominal with the mean.
+- For really granular data, there is likely no real proper "mode" to report.
+
+### A Comment on Dummy Variables
+
+Dummy variables behave curiously in measures of central tendency.
+
+- Mode: most frequently occurring value (as it is nominal).
+- Median: also the mode.
+- Mean: the proportion of 1s.
+
+
+### Dispersion
+
+We also need to know variables by reference to its **dispersion**.
+
+- i.e. "how average is 'average'?"
+- How far do variables deviate from the typical value?
+- If they do, measures of central tendency can be misleading.
+
+In a lot of applications, you can just visualize this or look for a table.
+
+- If you have continuous data, you can get a precise measure: the **standard deviation**.
+    - i.e. the square root of the sum of squared deviations for each observation from the mean.
+- For less precise data: just eye-ball it.
+    - You could ask for an inter-quartile range, but, again, eye-ball it.
+
+### How to Calculate a Standard Deviation
+
+```{r, echo=F}
+set.seed(8675309)
+x <- sample(c(22:49), 10, replace=TRUE)
+age <- x
+tibble(age = x,
+       mean = mean(x),
+
+              dvtn = age - mean,
+       sum_dvtn = sum(dvtn),
+       dvtn2 = dvtn^2,
+       sum_dvtn2 = sum(dvtn2),
+       variance = sum_dvtn2/9,
+       sd = sqrt(variance)) %>%
+  mutate_all(~round(.,3)) %>%
+  kbl(.,
+      caption = "Calculating the Mean and Standard Deviation of Ten People's Age",
+      align=c("ccccccc"),
+      linesep='', booktabs = TRUE, longtable = TRUE) %>%
+  row_spec(0, bold=TRUE) %>%
+  column_spec(8, color="red", bold=TRUE) %>%
+  kable_styling(font_size = 7)
+```
+
+Alternatively:
+
+\scriptsize
+
+```{r, echo=T}
+sd(x)
+```
+
+\normalsize
+
+### A Frequency Table
+
+```{r}
+Sweden %>%
+  count(region) %>%
+  mutate(region = as_factor(region)) %>%
+  mutate(perc = make_perclab(n/sum(n))) %>%
+  kbl(., caption = "A Frequency Table of the Region of Swedish Respondents (ESS, 2018/19)",
+      linesep = '', longtable = T, booktabs = T,
+      align = c("lcc"),
+      col.names = c("Region", "N", "Percentage")) %>%
+  row_spec(0, bold=TRUE) %>%
+  kable_styling(font_size = 10) %>%
+  footnote(general = "Data: European Social Survey v. 9 [edition: 3.1].")
+```
+
+### A Cumulative Percentage Table
+
+```{r}
+Sweden %>% 
+  count(pray) %>%
+  na.omit %>%
+  mutate(pray = as_factor(pray)) %>%
+  # mutate(pray = fct_rev(pray)) %>%
+  # arrange(pray) %>%
+  mutate(perc = n/sum(n),
+         cumsum = make_perclab(cumsum(perc)),
+         perc = make_perclab(perc)) %>%
+  kbl(.,caption = "How Often Do Swedes Say They Pray? (ESS, 2018/19)",
+      linesep = '', longtable = T, booktabs = T,
+      align = c("lccc"),
+      col.names = c("", "N", "Percentage", "Cumulative Percentage")) %>%
+  row_spec(0, bold=TRUE) %>%
+  kable_styling(font_size = 10) %>%
+  footnote(general = "Data: European Social Survey v. 9 [edition: 3.1].")
+```
+
+###
+
+```{r}
+Sweden %>%
+  filter(!is.na(eduyrs)) %>%
+  mutate(eduyrs = as_factor(eduyrs)) %>%
+  count(eduyrs) %>%
+  ggplot(.,aes(eduyrs, n)) + 
+  theme_steve_web() +
+  geom_bar(alpha = .8, color="black", fill="#619cff", stat="identity") +
+  geom_text(aes(label=n), color="black",
+            position=position_dodge(width=.9), 
+            size=3.5, vjust = -.5, family="Open Sans") +
+  scale_y_continuous(limits = c(0, 250)) +
+  labs(x = "Years of Education",
+       y = "Number of Observations in Category",
+       caption = "Data: Swedish respondents in the European Social Survey v. 9 [edition: 3.1].") -> p1
+
+Sweden %>%
+  count(pray) %>%
+  na.omit %>%
+  mutate(pray = as_factor(pray)) %>%
+  mutate(cat = c("Every\nday", "More than\nonce a week",
+                 "Once a\nweek",
+                 "At least\nonce a month",
+                 "Only on\nspecial holy days",
+                 "Less\noften",
+                 "Never")) %>%
+  mutate(cat = fct_inorder(cat)) %>%
+  ggplot(.,aes(cat, n)) +
+  geom_text(aes(label=n), color="black",
+            position=position_dodge(width=.9), 
+            size=4, vjust = -.5, family="Open Sans") +
+  theme_steve_web() +
+  scale_y_continuous(limits = c(0, 1000)) +
+  geom_bar(alpha = .8, color="black", fill="#619cff", stat="identity") +
+  labs(x = "How Often Swedes Say They Pray, Outside Religious Services",
+       y = "Number of Observations in Category",
+       title = "Nothing Beats Looking at Your Data for Rudimentary Diagnostics",
+       subtitle = "Bar charts like these may point to unusual heaping patterns or extreme/anomalous observations.") -> p2
+
+
+p2/p1
+```
+
+
+###
+
+```{r}
+Sweden %>%
+  ggplot(.,aes(nwspol)) +
+  geom_density(size=1.1, fill="#619cff", alpha =.3) +
+  theme_steve_web() +
+  geom_vline(xintercept = 60, linetype="solid") +
+  geom_vline(xintercept = 80.00925, linetype="dashed") +
+  scale_x_continuous(breaks = seq(0,1200, by=60)) +
+  labs(x = "Minutes in a Day Consuming News About Politics or Current Affairs",
+       y = "",
+       caption = "Data: European Social Survey v. 9 [edition: 3.1]. Vertical line added for median (60) and mean (80) in these data.",
+       title = "A Density Plot of News Consumption About Politics in Sweden",
+       subtitle = "There is a pretty obvious right skew for the politics addicts in these data.")
+```
+
+# Bivariate Analysis
+
+
+### Tools for Bivariate Analysis
+
+We're building toward regression, but let's start simple.
+
+- Correlation
+- Scatterplots
+
+### Correlation
+
+Correlation is a measure of how closely two things travel together.
+
+- **Pearson's correlation coefficient** (or **Pearson's *r***) will tell us how strongly two things travel together.
+
+### Pearson's *r*
+
+$$
+    \frac{\Sigma(\frac{x_i - \overline{x}}{s_x})(\frac{y_i - \overline{y}}{s_y})}{n - 1}
+$$
+
+...where:
+
+- $x_i$, $y_i$ = individual observations of *x* or *y*, respectively.
+- $\overline{x}$, $\overline{y}$ = means of *x* and *y*, respectively.
+- $s_x$, $s_y$ = standard deviations of *x* and *y*, respectively.
+- *n* = number of observations in the sample.
+
+### Properties of Pearsons *r*
+
+1. Pearson's *r* is symmetrical.
+2. Pearson's *r* is bound between -1 and 1.
+3. Pearson's *r* is standardized.
+
+###
+
+```{r}
+corn1 <- smvrnorm(50, mu = c(0,0), sigma = matrix(c(1,-1,-1,1), ncol = 2),
+               empirical = TRUE, seed=8675309) %>% as_tibble() %>% mutate(cat = "Perfect Negative Correlation (-1)")
+
+corn9 <- smvrnorm(50, mu = c(0,0), sigma = matrix(c(1,-.9,-.9,1), ncol = 2),
+               empirical = TRUE, seed=8675309) %>% as_tibble() %>% mutate(cat = "Very Strong Negative Correlation (-.9)")
+ 
+corn5 <- smvrnorm(50, mu = c(0,0), sigma = matrix(c(1,-.5,-.5,1), ncol = 2),
+               empirical = TRUE, seed=8675309) %>% as_tibble() %>% mutate(cat = "Moderate Negative Correlation (-.5)")
+
+cor0 <- smvrnorm(50, mu = c(0,0), sigma = matrix(c(1,0,0,1), ncol = 2),
+               empirical = TRUE, seed=8675309) %>% as_tibble() %>% mutate(cat = "No Correlation (0)")
+
+
+corp1 <- smvrnorm(50, mu = c(0,0), sigma = matrix(c(1,1,1,1), ncol = 2),
+               empirical = TRUE, seed=8675309) %>% as_tibble() %>% mutate(cat = "Perfect Positive Correlation (1)")
+
+corp9 <- smvrnorm(50, mu = c(0,0), sigma = matrix(c(1,.9,.9,1), ncol = 2),
+               empirical = TRUE, seed=8675309) %>% as_tibble() %>% mutate(cat = "Very Strong Positive Correlation (.9)")
+ 
+corp5 <- smvrnorm(50, mu = c(0,0), sigma = matrix(c(1,.5,.5,1), ncol = 2),
+               empirical = TRUE, seed=8675309) %>% as_tibble() %>% mutate(cat = "Moderate Positive Correlation (.5)")
+
+bind_rows(corn1, corn9, corn5, cor0,
+          corp5, corp9, corp1) %>%
+  mutate(cat = fct_inorder(cat)) %>%
+  ggplot(.,aes(V1, V2)) + geom_point() + geom_smooth(method = "lm") +
+  facet_wrap(~cat) +
+  theme_steve_web() +
+  labs(x = "Hypothetical X Variable", y = "Hypothetical Y Variable",
+       title = "Various Linear Patterns You Could Deduce from a Scatterplot",
+       subtitle = "Do note: you can describe these correlations however you want. There is no formal metric, beyond direction, perfection, and zero.",
+       caption = "Data: Simulated with smvrnorm() in {stevemisc} package.")
+```
+
+###
+
+```{r}
+Datasaurus %>%
+  ggplot(.,aes(x,y)) +
+  facet_wrap(~dataset) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  theme_steve_web() +
+  labs(title = "Beware the Datasaurus!",
+       x = "", y = "",
+       subtitle = "No, seriously. Look at your damn data and never trust a summary statistic without looking at it.",
+       caption = "Data: Cairo (2016) and Matejka and Fitzmaurice (2017). Note: all these data sets have the same means and standard deviations for x and y, along with the same correlation.")
+```
+
+# Conclusion
+### Conclusion
+
+On levels of measurement:
+
+- Dummy variables are a special class of nominal variables.
+- You can think of ordinal as continuous if there are enough values and no weird clumping for finite responses.
+- A "continuous" measure: iff (sic) a mean would make sense (whether or not it's the best measure of central tendency).
+
+On central tendency and dispersion:
+
+- *Look at your damn data.*
+- "Average" might not look so "average."
+    - There's a reason a lot of economic data are summarized in medians.
+- *Look at your damn data.*
+    - No seriously: never trust a summary statistic without first looking at it.
