@@ -2,10 +2,10 @@
   filename: intro-r-rstudio
   tldr: "A {tidyverse}-oriented lab for introducing students to R and Rstudio."
 
-# - title: "Some Basics of Descriptive Inference"
-#   filename: descriptive-inference
-#   tldr: "A lab session on things like modes, medians, means, and variable types."
-#   
+- title: "Some Basics of Descriptive Inference"
+  filename: descriptive-inference
+  tldr: "A lab session on things like modes, medians, means, and variable types."
+
 # - title: "Associational and Inferential Techniques"
 #   filename: association-lab
 #   tldr: "A lab session on associational techniques/limitations and a basic discussion of inference."
