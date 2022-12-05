@@ -151,7 +151,7 @@ The classic typology, a la Stanley Smith.
 
 
 1. Does it have just two values?
-2. Does an arithmetic mean ("average") make sense?
+2. Would an arithmetic mean ("average") make sense if (when) it has decimal points?
 
 
 ### Dummy Variables
@@ -162,9 +162,10 @@ A variable with just two values is called a **dummy variable**.
 - Some type of phenomenon is either present or absent.
 - A statistical analysis will typically impose 0s and 1s on these variables, even if you see names/labels.
 
-Gender is the most common and intuitive dummy variables.
+Gender is among the most common and intuitive dummy variables.
 
 - We typically code women as 1, men as 0.
+- Caveat: this might be changing the more we understand/unpack gender.
 
 We don't try to explain variations in gender (seriously, don't), but gender may explain phenomena of interest.
 
@@ -179,7 +180,7 @@ We don't try to explain variations in gender (seriously, don't), but gender may 
 - Ordinal ("ordered-categorical")
 - Both have a finite set of values that can occur.
 
-If yes, you can call it "continuous".
+If yes, you can call it "continuous" (or "interval", or whatever).
 
 - Counts, integers, percentages, proportions, ratio, real numbers, to name a few.
 - All these are much more granular, have far more possible values.
@@ -273,7 +274,7 @@ How would you know when it's ordinal or continuous?
 
 We love to treat technically ordinal variables as continuous when we can.
 
-- Especially true for age and income.
+- Certainly true for age and income.
 
 Ask yourselves two questions.
 
@@ -469,6 +470,7 @@ Dummy variables behave curiously in measures of central tendency.
 - Mean: the proportion of 1s.
 
 
+
 ### Dispersion
 
 We also need to know variables by reference to its **dispersion**.
@@ -538,22 +540,25 @@ Sweden %>%
 ### A Cumulative Percentage Table
 
 ```{r}
-Sweden %>% 
-  count(pray) %>%
-  na.omit %>%
-  mutate(pray = as_factor(pray)) %>%
-  # mutate(pray = fct_rev(pray)) %>%
-  # arrange(pray) %>%
-  mutate(perc = n/sum(n),
-         cumsum = make_perclab(cumsum(perc)),
+
+tibble(x = c("Never or Less Than Once a Year",
+             "Once a Year",
+             "Several Times a Year",
+             "Once a Month",
+             "2-3 Times a Month",
+             "Nearly Every Week",
+             "Every Week or More"),
+       n = c(853, 300, 239, 146, 186,88,520),
+       perc = n/sum(n)) %>%
+  mutate(cumsum = make_perclab(cumsum(perc)),
          perc = make_perclab(perc)) %>%
-  kbl(.,caption = "How Often Do Swedes Say They Pray? (ESS, 2018/19)",
+  kbl(.,caption = "How Often Do Americans Say They Attend Religious Services?",
       linesep = '', longtable = T, booktabs = T,
       align = c("lccc"),
       col.names = c("", "N", "Percentage", "Cumulative Percentage")) %>%
   row_spec(0, bold=TRUE) %>%
   kable_styling(font_size = 10) %>%
-  footnote(general = "Data: European Social Survey v. 9 [edition: 3.1].")
+  footnote(general = "Data: General Social Survey (2018)")
 ```
 
 ###
