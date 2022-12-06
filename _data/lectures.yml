@@ -13,6 +13,11 @@
   dirname: descriptive-statistics
   tldr: "Understanding the kind of information your variable communicates will condition how you can describe them, and never trust a summary statistic of a variable (or two variables) without looking at them first."
 
+- title: "Probability and Sampling"
+  filename: probability-sampling
+  dirname: probability-sampling
+  tldr: "There are very important rules of probability and distributions that underpin applied statistics. Here's a handful of those. Also: here's a crash course on the logic of random sampling and central limit theorem."
+
 
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
