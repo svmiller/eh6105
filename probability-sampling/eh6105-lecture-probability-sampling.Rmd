@@ -1,0 +1,619 @@
+---
+output: 
+  stevetemplates::beamer:
+    latex_engine: xelatex # use xelatex here instead! I recommend it, but this is minimal reprex
+    dev: cairo_pdf # I typically comment this out  if latex_engine: pdflatex
+    slide_level: 3 # I prefer this, but I won't force it on you.
+    theme: metropolis
+title: "Probability and Sampling"
+subtitle: EH6105 -- Quantitative Methods
+author: Steven V. Miller
+institute: Department of Economic History and International Relations
+titlegraphic: "`r paste0(Sys.getenv('HOME'), '/Dropbox/stockholm/su-logotyp.png')`"
+titlegraphshift: "\\vspace{6cm}"
+make149: true
+mainfont: "Open Sans Light"
+titlefont: "Titillium Web"
+fontsize: 10pt
+header-includes:
+- \usepackage{dcolumn}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+---
+
+
+
+```{r setup, include=FALSE, cache=F, message=F, warning=F, results="hide"}
+knitr::opts_chunk$set(cache=TRUE, warning=F, message=F, echo=FALSE, fig.width = 14, fig.height = 8.5)
+knitr::opts_chunk$set(fig.path='figs/')
+knitr::opts_chunk$set(cache.path='cache/')
+
+knitr::opts_chunk$set(
+                  fig.process = function(x) {
+                      x2 = sub('-\\d+([.][a-z]+)$', '\\1', x)
+                      if (file.rename(x, x2)) x2 else x
+                      }
+                  )
+```
+
+
+```{r loadstuff, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+options(knitr.kable.NA = '')
+library(tidyverse)
+library(stevemisc)
+library(stevedata)
+# library(peacesciencer)
+# library(fixest)
+library(kableExtra)
+# library(modelsummary)
+library(patchwork)
+library(cowplot); #library(artyfarty)
+
+options("modelsummary_format_numeric_latex" = "plain")
+options(knitr.kable.NA = '')
+```
+
+```{r loaddata, cache=F, eval=T, echo=F, message=F, error=F, warning=F}
+
+library(dqrng)
+
+Population <- rbnorm(250000, mean =42.42, sd = 38.84,
+                     lowerbound = 0, 
+                     upperbound = 100,
+                     round = TRUE,
+                     seed = 8675309) # Jenny, I got your number...
+```
+
+# Introduction
+### Goal(s) for Today
+
+1. Introduce some basic features of probability, counting, and the normal distribution.
+2. Simulate central limit theorem and the logic of random sampling.
+
+# Probability
+### Probability
+
+Probability refers to the chance of some event occurring.
+
+- It's a ubiquitous feature of the world and you should know it anyway.
+- Interestingly, it was developed rather late in human history.
+- Origins: gambling in the 17th-18th centuries.
+
+Probability theory is a precursor to statistics and applied mathematics.
+
+-  It’s mathematical modeling of uncertain reality.
+
+## Basic Probability
+### Rules of Probability
+
+Here are some (but not all) important rules for probability.
+
+1. Collection of all possible events ($E_1$ ... $E_n$) is a **sample space**.
+	- *S* as a **set** for a coin flip *S* = { Heads, Tails }.
+2. Probabilities must satisfy inequality 0 $\le$ *p* $\le$ 1.
+3. Sum of probability in sample space must equal 1.
+	- Formally: $\Sigma_{E_i \in S} \enspace p(E_i) = 1$
+4. If event *A* and event *B* are *independent* of each other, the **joint probability** of both occurring is $p(A,B) = p(A)*p(B)$.
+5. If probability of event *A* depends on event *B* having already occurred, the **conditional probability** of *A* "given" *B* is a bit different.
+
+$$
+    p(A \thinspace | \thinspace B) = \frac{p(A , B)}{p(B)}
+$$
+
+
+### Total Probability and Bayes' Theorem
+
+Recall: $p(A \thinspace | \thinspace B) = \frac{p(A , B)}{p(B)}$ . And: $p(B \thinspace | \thinspace A) = \frac{p(B , A)}{p(A)}$ 
+
+- Moving stuff around: $p(A, B) = p(A \thinspace | \thinspace B) *p(B)$ and $p(B, A) = p(B \thinspace | \thinspace A) *p(A)$.
+- By definition: $p(A, B) = p(B, A)$
+- Therefore: $p(A \thinspace | \thinspace B) *p(B) = p(B \thinspace | \thinspace A) *p(A)$
+
+Two different total probabilities emerge:
+
+- $p(A \thinspace | \thinspace B) = \frac{p(B \thinspace | \thinspace A) * p(A)}{p(B)}$
+- $p(B \thinspace | \thinspace A) = \frac{p(A \thinspace | \thinspace B) * p(B)}{p(A)}$
+
+Confusing the two as equivalent is what you call a **prosecutor's fallacy**.
+
+- Read about Sally Clark for a real life horror story of the misuse of conditional probability.
+
+## Counting
+### Counting
+
+A basic premise to computing probability is counting.
+
+- It seems basic, but there are multiple ways of doing this.
+
+There's a thing called the **Fundamental Theorem of Counting**:
+
+1. If there are *k* distinct decision stages to a process...
+2. ...and each has its own $n_k$ number of alternatives...
+3. ...then there are $\prod_{i=1}^{k} n_k$ possible outcomes.
+
+
+### Four Methods of Counting
+
+A form of counting follows choice rules of **ordering** and **replacement**.
+
+1. Ordered, with replacement ($n^k$ alternatives)
+2. Ordered, without replacement ($\frac{n!}{(n-k)!}$ alternatives)
+3. Unordered, without replacement ($\frac{n!}{(n-k)!k!} = {n \choose k}$ alternatives)
+
+There's a fourth method (unordered, with replacement), but it is unintuitive, not much used, and I won't belabor it here.
+
+
+### An Illustration
+
+There are 33 of you. How many different ways can I devise a random sample of 5 of you?
+
+- Ordered, with replacement: $33^5$ = 39,135,393
+- Ordered, without replacement: $\frac{n!}{(n-k)!} = \frac{33!}{28!}$ = 28,480,320
+- Unordered, without replacement: ${33 \choose 5}$ = 237,336
+
+## Binomial Theorem and Mass Function
+### Binomial Theorem
+
+The most common use of a choose notation is the **binomial theorem**.
+
+- Given any real numbers *X* and *Y* and a nonnegative integer *n*,
+
+\begin{equation}
+  (X + Y)^n = \sum \limits_{k=0}^n {n \choose k} x^k y^{n-k}
+\end{equation}
+
+\bigskip
+
+A special case occurs when *X* = 1 and *Y* = 1.
+
+\begin{equation}
+  2^n = \sum \limits_{k=0}^n {n \choose k}
+\end{equation}
+
+<!-- ### Binomial Theorem -->
+
+<!-- This is another theorem with an interesting history. -->
+
+<!-- - Euclid knew of it in a simple form. -->
+<!-- - The Chinese may have discovered it first (Chu Shi-Kié, 1303) -->
+<!-- - General form presented here owes to Pascal in 1654. -->
+
+### Binomial Theorem
+
+The binomial expansion increases in polynomial terms at an interesting rate.
+
+\begin{eqnarray}
+(X + Y)^0 &=& 1 \nonumber \\
+(X + Y)^1 &=& X + Y \nonumber \\
+(X + Y)^2 &=& X^2 + 2XY + Y^2 \nonumber \\
+(X + Y)^3 &=& X^3 + 3X^2Y + 3XY^2 + Y^3 \nonumber \\
+(X + Y)^4 &=& X^4 + 4X^3Y + 6X^2Y^2 + 4XY^3 + Y^4 \nonumber \\
+(X + Y)^5 &=& X^5 + 5X^4Y + 10X^3Y^2 + 10X^2Y^3 + 5XY^4 + Y^5 
+\end{eqnarray}
+
+Notice the symmetry?
+
+- You're looking at **Pascal's triangle**, btw...
+
+<!-- ## Pascal's Triangle -->
+### Pascal's Triangle
+
+The coefficients form **Pascal's triangle**, which summarizes the coefficients in a binomial expansion.
+
+
+\begin{tabular}{cccccccccccccc}
+$n=0$:& & & &    &    &    &    &  1\\\noalign{\smallskip\smallskip}
+$n=1$:& & & &   &    &    &  1 &    &  1\\\noalign{\smallskip\smallskip}
+$n=2$:& & & &   &    &  1 &    &  2 &    &  1\\\noalign{\smallskip\smallskip}
+$n=3$:& & & &   &  1 &    &  3 &    &  3 &    &  1\\\noalign{\smallskip\smallskip}
+$n=4$:& & & & 1 &    &  4 &    &  6 &    &  4 &    &  1\\\noalign{\smallskip\smallskip}
+$n=5$: & & & 1 &   &  5  &   &  10  &   &  10  &   &  5  &  & 1\\\noalign{\smallskip\smallskip}
+\end{tabular}
+
+<!-- ### Pascal's Triangle -->
+
+<!-- Beyond the pyramidal symmetry, Pascal's triangle has a lot other cool features. -->
+
+<!-- - Any value in the table is the sum of the two values diagonally above it. -->
+<!-- - The sum of the *k*th row (counting the first row as zero row) can be calculated as $\sum\limits_{j=0}^k {k \choose j} = 2^k$ -->
+<!-- - If you left-justify the triangle, the sum of the diagonals form a Fibonacci sequence. -->
+<!-- - If a row is treated as consecutive digits, each row is a power of 11 (i.e. magic 11s). -->
+
+<!-- There are many more mathematical properties in Pascal's triangle. These are just the cooler/more famous ones. -->
+
+### These Have a Purpose for Statistics
+
+Let's start basic: how many times could we get heads in 10 coin flips?
+
+- The sample space *S* = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+- We expect 10 heads (or no heads) to be unlikely, assuming the coin is fair.
+
+### Binomial Mass Function
+
+*This is a combination issue*.
+
+- For no heads, *every* flip must be a tail.
+- For just one head, we have more combinations.
+
+How many ways can a series of coin flips land on just one head?
+
+- For a small number of trials, look at Pascal's triangle.
+- For 5 trials, there is 1 way to obtain 0 heads, 5 ways to obtain 1 head, 10 ways to obtain 2 and 3 heads, 5 ways to obtain 4 heads, and 1 way to obtain 5 heads.
+
+### Binomial Mass Function
+
+This is also answerable by reference to the **binomial mass function**, itself derivative of the **binomial theorem**.
+
+\begin{equation}
+  p(x) = {n \choose x} p^x(1-p)^{n - x}, 
+\end{equation}
+
+where:
+
+- *x* = the count of "successes" (e.g. number of heads in a sequence of coin flips)
+- *n* = the number of trials.
+- *p* = probability of success in any given trial.
+
+### Binomial Mass Function
+
+What's the probability of getting five heads on ten fair coin flips.
+
+\begin{eqnarray}
+p(x = 5 \thinspace | \thinspace n = 10, p = .5) &=& {10 \choose 5 } (.5)^5(1-.5)^{10-5} \nonumber \\
+&=& (252)*(.03125)*(.03125) \nonumber \\
+ &=& 0.2460938
+\end{eqnarray}
+
+
+In R:
+
+```{r, echo=T}
+dbinom(5,10,.5)
+```
+
+### An Application: The Decline of War?
+
+![](decline-of-war.png)
+
+### The Decline of War?
+
+Pinker (2011) argues the absence of world wars since WW2 shows a decline of violence. But:
+
+- This kind of war is fantastically rare.
+- Gibler and Miller (Forthcoming) code 1,958 confrontations from 1816 to 2014.
+- Of those: 84 are wars (*p* = .042)
+- Of the wars, only 24 are wars we could think of as "really big" (*p* = .012)
+
+### The Decline of War?
+
+
+The year is 2022. We haven't observed a World War II in, basically, 75 years. What is the probability of us *not* observing this where:
+
+- *p* = .042, the overall base rate of war vs. not-war?
+- *p* = .012, the overall base rate of a "really big war"?
+
+
+###
+
+```{r, eval = FALSE, echo=TRUE}
+# library(tidyverse)
+tibble(num_wars = c(0:7),
+       base = dbinom(num_wars, 75, .042),
+       rbw = dbinom(num_wars, 75, .012)) 
+```
+
+###
+
+```{r}
+tibble(num_wars = c(0:7),
+       base = dbinom(num_wars, 75, .042),
+       rbw = dbinom(num_wars, 75, .012)) %>%
+  gather(var, val, -num_wars) %>%
+  mutate(var = ifelse(var == "base", "Base Rate of War", "Base Rate of 'Really Big Wars'")) %>%
+  mutate(lab = round(val, 3)) %>%
+  ggplot(.,aes(as.factor(num_wars), val, fill=var)) +
+  geom_bar(stat = "identity", position = "dodge", color="black") +
+  geom_text(aes(label=lab), vjust=-.5, colour="black",
+            position=position_dodge(.9), size=3.5, family="Open Sans") +
+  theme_steve_web() +
+  labs(title = "The Probability of the Number of (Observed) Wars in 75 Years, Given Assumed Rates of War",
+       subtitle = "Knowing how rare 'really big wars' are, it's highly probable (p = .404) that we haven't observed one 75 years after WW2.",
+       fill = "",
+       x = "Number of Observed Wars", y = "Probability of This Number of War in a 75-year Period")
+
+```
+
+<!-- ### -->
+
+
+<!-- ```{r} -->
+
+<!-- tibble(num_wars = rep(c(0, 1, 2), 100)) %>% -->
+<!--   arrange(num_wars) %>% -->
+<!--   mutate(period = rep(seq(1:100), 3), -->
+<!--          p = dbinom(num_wars, period, 0.012)) %>% -->
+<!--   mutate(cat = case_when( -->
+<!--     num_wars == 0 ~ "Zero Wars", -->
+<!--     num_wars == 1 ~ "One War", -->
+<!--     num_wars == 2 ~ "Two Wars" -->
+<!--   ), -->
+<!--   cat = fct_relevel(cat, "Zero Wars", "One War", "Two Wars")) %>% -->
+<!--   ggplot(.,aes(period, p, color=cat, linetype=cat)) + -->
+<!--   geom_line(size=1.1) + -->
+<!--   theme_steve_web() + -->
+<!--   labs(y = "Probability of Observing This Many Wars Over 100 Years", -->
+<!--        x = "", -->
+<!--        title = "The Probability of Observing a Set Amount of 'Really Big Wars' Over a 100-Year Period", -->
+<!--        color = "", linetype = "", -->
+<!--        subtitle = "After 75 years, it's still more probable that we haven't observed a 'really big war' than having observed just one.") -->
+
+<!-- ``` -->
+
+## Normal Density Function
+### Normal Functions
+
+A "normal" function is also quite common.
+
+- Data are distributed such that the majority cluster around some central tendency.
+- More extreme cases occur less frequently.
+
+### Normal Density Function
+
+We can model this with a **normal density function**.
+
+- Sometimes called a Gaussian distribution in honor of Carl Friedrich Gauss, who discovered it.
+
+\begin{equation}
+    f(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e \thinspace \{ -\frac{(x -\mu)^2}{2\sigma^2} \},
+\end{equation}
+
+where: $\mu$ = the mean, $\sigma^2$ = the variance.
+
+### Normal Density Function
+
+Properties of the normal density function.
+
+- The tails are asymptote to 0.
+- The kernel (inside the exponent) is a basic parabola.
+    - The negative component flips the parabola downward.
+- Denoted as a function in lieu of a probability because it is a continuous distribution.
+- The distribution is perfectly symmetrical.
+    - *-x* is as far from $\mu$ as *x*.
+    
+### Normal Density Function
+
+*x* is unrestricted. It can be any value you want in the distribution.
+
+- $\mu$ and $\sigma^2$ are parameters that define the shape of the distribution.
+    - $\mu$ defines the central tendency. 
+    - $\sigma^2$ defines how short/wide the distribution is.
+    
+### Demystifying the Normal Distribution
+
+Notice: we're describing this distribution as a *function*. It does not communicate probabilities.
+
+- The normal distribution is continuous. Thus, probability for any one value is basically 0.
+
+That said, the area *under* the curve is the full domain and equals 1.
+
+- The probability of selecting a number between two points on the x-axis equals the area under the curve *between* those two points.
+    
+###
+
+```{r ggplotshade, eval=TRUE, echo=FALSE,  fig.width=14, fig.height=8.5, warning=F, message=F}
+normal_dist("#002F5F","#9BB2CE", "Open Sans") + 
+  theme_steve_web() + 
+  # ^ all from stevemisc
+    labs(title = "The Area Underneath a Normal Distribution",
+       subtitle = "The tails extend to infinity and are asymptote to zero, but the full domain sums to 1. 95% of all possible values are within about 1.96 standard units from the mean.",
+       y = "Density",
+       x = "")
+```
+
+# Central Limit Theorem
+### Central Limit Theorem
+
+The **central limit theorem** says:
+
+- with an infinite number samples of size *n*...
+- from a population of *N* units...
+- the sample means will be normally distributed.
+
+Corollary findings:
+
+- The mean of sample means would equal $\mu$.
+- Random sampling error would equal the standard error of the sample mean ($\frac{\sigma}{\sqrt{n}}$)
+
+
+### A Comment on Random Sampling
+
+This theorem assumes a simple random sample of the population.
+
+- Each unit has equal probability of inclusion vs. exclusion.
+
+This introduces random sampling error, by definition.
+
+- However, we can model this ($\frac{\sigma}{\sqrt{n}}$), and it's better than systematic sampling error.
+- On the latter: read about the 1936 Literary Digest Poll.
+
+### An Applied Example from a Thermometer Rating
+
+Let's use a real-world illustration from the 2020 ANES exploratory testing survey.
+
+- Survey period: April 10-18, 2020 (online).
+- Released July 27, 2020
+
+The question is a basic thermometer rating of Donald Trump.
+
+- Scale: 0 ("coldest") to 100 ("warmest")
+
+###
+
+```{r trumptherm, echo=F, eval=T, warning=F, fig.width=14, fig.height=8.5}
+trump_mean <- round(mean(therms$fttrump1, na.rm=T), 2)
+trump_median <- round(median(therms$fttrump1, na.rm=T), 2)
+trump_sd <- round(sd(therms$fttrump1, na.rm=T), 2)
+
+trump_label <- paste0("Mean (solid): ", trump_mean,
+                      "\nMedian (dashed): ", trump_median,
+                      "\nStandard deviation: ", trump_sd)
+
+therms %>%
+  ggplot(.,aes(fttrump1)) +
+  geom_histogram(binwidth = 1, alpha=.6, color="black") +
+  theme_steve_web() +
+  geom_segment(x=median(therms$fttrump1, na.rm=T), y=0, xend=median(therms$fttrump1, na.rm=T), yend=Inf, linetype="dashed") +
+  geom_segment(x=mean(therms$fttrump1, na.rm=T), y=0, xend=mean(therms$fttrump1, na.rm=T), yend=Inf, linetype="solid") +
+  scale_x_continuous(breaks = seq(0, 100, by =10)) +
+  annotate(geom="text",x=100, y=700,
+           label=trump_label,
+           size=3.5, hjust=1,
+           vjust=1,
+           family="Open Sans") +
+  labs(title = "Thermometer Ratings for Donald Trump (ANES ETS, 2020)",
+       subtitle = "Thermometer ratings for divisive political figures in the U.S. tend to be ugly as hell with estimates of central tendency that don't faithfully capture the data.",
+       x = "Thermometer Scale [0:100]", y = "Number of Observations in Response",
+       caption = "Data: American National Election Studies (Exploratory Testing Survey, 2020). N = 3,073.")
+```
+
+
+### What We'll Do
+
+Let's create a hypothetical "population" with the set parameters from the Trump ratings.
+
+- Data will be bound between 0 and 100 with a mean of 42.42 and standard deviation of 38.84.
+- N  = 250,000 (i.e. scaled down from U.S. adult population of ~250 million).
+
+We want to approximate the "population" mean thermometer rating via central limit theorem.
+
+- We'll grab a million samples of ten respondents and store the sample means.
+
+Let's plot the results.
+
+### R Code
+
+```r
+# rbnorm() from {stevemisc}
+Population <- rbnorm(250000, mean =42.42, sd = 38.84,
+                     lowerbound = 0, 
+                     upperbound = 100,
+                     round = TRUE,
+                     seed = 8675309) # Jenny, I got your number...
+```
+
+Note: it's hard to perfectly mimic these kind of thermometer ratings from a simple distribution, but this will do.
+
+- Mean: `r mean(Population)`
+- Standard deviation: `r sd(Population)`
+
+<!-- ### R Code -->
+
+```{r sampmil, echo=F, eval=T, cache=TRUE}
+set.seed(8675309) # Jenny, I got your number...
+# Note {dqrng} offers much faster sampling at scale
+# This is the dqsample() function
+Popsamples <- tibble(
+  samplemean=sapply(1:1000000,
+           function(i){ x <- mean(
+             dqsample(Population, 10,
+                    replace = FALSE))
+           }))
+```
+
+###
+
+```{r plotsampmil, echo=F, eval=T, fig.width=14, fig.height=8.5}
+Popsamples %>%
+  ggplot(.,aes(samplemean)) + geom_histogram(binwidth=.5,aes(y=..density..),alpha=0.7) +
+  theme_steve_web() + 
+  geom_vline(xintercept = mean(Population), linetype="dashed") +
+  stat_function(fun=dnorm,
+                color="#002F5F", size=1.5,
+                args=list(mean=mean(Popsamples$samplemean), 
+                          sd=sd(Popsamples$samplemean))) +
+  labs(x = "Sample Mean", y = "Density",
+       title = "The Distribution of 1,000,000 Sample Means, Each of Size 10",
+       subtitle = "Notice the distribution is normal and the mean of sample means converges on the known population mean (vertical line).",
+       caption = "Data: Simulated data for a population of 250,000 where mean = 42.42 and standard deviation = 38.84.")
+
+```
+
+<!-- ### How Did We Do? -->
+
+<!-- See for yourself: -->
+
+<!-- ```{r compare, echo=T} -->
+<!-- mean(Popsamples$samplemean) -->
+<!-- mean(Population) -->
+
+<!-- ``` -->
+
+<!-- Not bad... -->
+
+
+### Implications of Central Limit Theorem
+
+Infinite samples of *any* size (even absurdly small samples of high-variation data) reduce the gap between estimate and "true" population parameter.
+
+- Infinity samples gloss over the implications of random sampling error.
+
+However, random sampling error decreases non-monotonically as a function of sample size.
+
+- i.e. a good-sized sample reduces random sampling error in even high-variation data.
+
+
+###
+
+```{r sampleftobama, echo=F, eval=T,  fig.width=14, fig.height=8.5}
+sample_sizes <- c(10, 25, 100, 400, 1000, 2000, 4000, 10000)
+
+Samps = list() 
+set.seed(8675309)
+for (j in sample_sizes) {
+   Samps[[paste0("Sample size: ", j)]] = data.frame(sampsize=j, samp=sapply(1:10, function(i){ x <- sample(Population, j, replace = FALSE) }))
+}
+
+Samps %>%
+  map_df(as_tibble) %>%
+  gather(samp, value, samp.1:samp.10) -> Samps
+
+Samps %>%
+  group_by(sampsize, samp) %>%
+  summarize(sampmean = mean(value)) %>%
+  ggplot(., aes(as.factor(sampsize),sampmean)) + 
+  geom_point(size=3, color="black", alpha=0.5) +
+  theme_steve_web() + 
+  geom_hline(yintercept = mean(Population), linetype="dashed") +
+  labs(x = "Sample Size",
+       y = "Sample Means",
+       title = "Ten Sample Means of Varying Sample Sizes from a Population",
+       subtitle = "The diminishing returns of increasing sample size emerge around 1,000 observations, even as the spread in these simulated data is quite large.",
+       caption = "Data: Simulated data for a population of 250,000 where mean = 42.42 and standard deviation = 38.84.")
+
+```
+
+
+# Conclusion
+### Conclusion
+
+Probability (i.e. the stuff under the hood):
+
+- Don't confuse $p(B | A)$ as equal to $p(A | B)$.
+- Learn to "count".
+- Understand some basic properties of a normal distribution.
+
+Sampling:
+
+- Central limit theorem
+- Random samples -> random sampling error (and that's fine).
+- Absent infinity samples: get a good size sample.
+- The sample statistic that emerges is the best guess of the population parameter.
