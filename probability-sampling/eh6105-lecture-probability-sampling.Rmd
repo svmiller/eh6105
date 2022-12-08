@@ -202,7 +202,7 @@ The binomial expansion increases in polynomial terms at an interesting rate.
 
 Notice the symmetry?
 
-- You're looking at **Pascal's triangle**, btw...
+<!-- - You're looking at **Pascal's triangle**, btw... -->
 
 <!-- ## Pascal's Triangle -->
 ### Pascal's Triangle
@@ -613,7 +613,7 @@ Probability (i.e. the stuff under the hood):
 
 Sampling:
 
-- Central limit theorem
+- Central limit theorem: a population may not be "normal" but its random sampling distribution is.
 - Random samples -> random sampling error (and that's fine).
 - Absent infinity samples: get a good size sample.
 - The sample statistic that emerges is the best guess of the population parameter.
