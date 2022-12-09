@@ -18,6 +18,11 @@
   dirname: probability-sampling
   tldr: "There are very important rules of probability and distributions that underpin applied statistics. Here's a handful of those. Also: here's a crash course on the logic of random sampling and central limit theorem."
 
+- title: "Hypothesis Testing"
+  filename: hypothesis-testing
+  dirname: hypothesis-testing
+  tldr: "Applied hypothesis testing reduces to statements about the probability of the test statistic, given some assumed/fixed population parameter. It's not quite the question you're asking, but it's the answer you're getting."
+
 
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
