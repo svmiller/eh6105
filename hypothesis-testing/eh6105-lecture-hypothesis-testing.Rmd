@@ -141,7 +141,7 @@ Let's revisit the data we created.
 
 ```r
 # rbnorm() from {stevemisc}
-Population <- rbnorm(250000, mean =42.42, sd = 38.84,
+Population <- rbnorm(250000, mean = 42.42, sd = 38.84,
                      lowerbound = 0, 
                      upperbound = 100,
                      round = TRUE,
@@ -304,7 +304,7 @@ A **95-percent confidence interval** can be informative.
 
 How we apply this for our problem.
 
-- We have our x-bar.
+- We have our $\overline{x}$.
 - We have our *n* and assume a known $\sigma$.
 - Standard error = `r round(sd(Population)/sqrt(length(oursample)), 3)` ($\frac{\sigma}{\sqrt{n}} = \frac{38.88}{\sqrt{100}} = 3.88$)
 
@@ -357,11 +357,11 @@ We're not saying, for the moment, the true population mean is between those two 
 ## An Illustraiton of Inference
 ### An Illustration of Inference
 
-Assume we have a politician's supporter who is suspicious of our *x*-bar.
+Assume we have a politician's supporter who is suspicious of our $\overline{x}$.
 
-- (S)he claims it has to be much higher. Say: 56.61.
+- They claims it has to be much higher. Say: 56.61.
     - Rationale: this is the percentage of the vote Trump in the precinct where I lived during the 2020 election.
-    - In other words, (s)he is basically inferring by anecdote or making hasty generalizations from his/her surroundings.
+    - In other words, they are basically inferring by anecdote or making hasty generalizations from his/her surroundings.
 
 So what can we do about this claim?
 
@@ -390,9 +390,19 @@ z = \frac{\overline{x} - \mu}{s.e.}
 
 ### ...or in R
 
+\scriptsize
+
 ```{r orinr, echo=T}
-1 - pnorm(abs((mean(oursample) - 56.61)/sem))
+# one-tailed (i.e. I'm assuming the direction)
+pnorm(abs((mean(oursample) - 56.61)/sem), lower.tail=FALSE)
+# two-tailed (i.e. I don't know the direction)
+# Notice there really isn't much happening in this distinction
+# "two-tail" is a sort of default, but it's kind of silly that it is.
+2*pnorm(abs((mean(oursample) - 56.61)/sem), lower.tail=FALSE)
 ```
+
+
+\normalsize
 
 ### An Illustration of Inference
 
@@ -411,16 +421,28 @@ What do we conclude?
 - We suggest this hypothetical supporter is likely wrong in their assertion.
 - We offer that our sample mean is closer to what $\mu$ really is.
 
-Since we've been playing god this whole time, we know that's true.
+Since we've been playing god this whole time, we incidentally know that's true.
+
+- However, this procedure doesn't necessarily tell you what $\mu$ is.
+- It's communicating what you think it's highly unlikely to be.
 
 ### What About the Known Population Mean?
 
 How likely was our $\overline{x}$ of `r round(mean(oursample), 2)` given the $\mu$ of `r round(mean(Population), 2)`? Same process.
 
+\scriptsize
+
 ```{r sameprocess, echo=T}
 (mean(oursample) - mean(Population))/sem
-1 - pnorm(abs((mean(oursample) - mean(Population))/sem))
+# One tail (i.e. I'm assuming the direction)
+pnorm(abs((mean(oursample) - mean(Population))/sem), 
+        lower.tail=FALSE)
+# Two tail (i.e. I'm agnostic about the direction)
+2*pnorm(abs((mean(oursample) - mean(Population))/sem), 
+        lower.tail=FALSE)
 ```
+
+\normalsize
 
 The probability of our sample mean, given the population mean (that we know), is `r round(1-pnorm(abs((mean(oursample)-mean(Population))/sem)), 2)`.
 
@@ -442,14 +464,34 @@ Uncertainty increases with fewer degrees of freedom.
 
 ![Student's t-distribution](t_distribution.png)
 
+### ...or in R
 
+\scriptsize
+
+```{r, echo=T, eval=T}
+# proposed mean
+(mean(oursample) - 56.61)/(sd(oursample)/
+                             sqrt(100))  -> tstat1 
+ # actual mean
+(mean(oursample) - mean(Population))/(sd(oursample)/
+                                        sqrt(100)) -> tstat2
+
+# probability of what we got, if the politician's supporter is right
+pt(-abs(tstat1), df = 100-1) # one tail
+2*pt(-abs(tstat1), df = 100-1) # two tail
+# probability of what we got, knowing what the population mean is
+pt(-abs(tstat2), df = 100-1) # one tail
+2*pt(-abs(tstat2), df = 100-1) # two tail
+```
+
+\normalsize
 
 # Conclusion: What Are We Actually Doing?
 ### Conclusion: The Process of Inference
 
 Notice the process of inference.
 
-1. Assume the hypothetical mean to be correct.
+1. Assume the hypothetical mean to be correct (as a hypothesis, if you will).
 2. Test the claim about the hypothetical mean based on a random sample.
 3. Infer about the claim of the population mean using probabilistic inference.
 
@@ -464,5 +506,6 @@ Does that look familiar? It's $p(\bar{x} | \mu)$.
 
 - But this process gives an indirect answer to the question you're asking.
 - *Within* a desired confidence interval: "I can't rule these out."
-- *Outside* a desired confidence interval: "what I got is highly unlikely if what you're proposing were actually were true."
-- You'll learn more about what $\mu$ can be by assessing what it's highly unlikely to be.
+- *Outside* a desired confidence interval: "what I got is highly unlikely if what you're proposing were actually true."
+
+Still: you'll learn more about what $\mu$ can be by assessing what it's highly unlikely to be.
