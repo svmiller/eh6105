@@ -89,7 +89,7 @@ Popsamples <- tibble(
 # Introduction
 ### Goal(s) for Today
 
-1. Revisit the logic of (infinity) random sampling from a knonw population.
+1. Revisit the logic of (infinity) random sampling from a known population.
 2. Introduce students to the so-called "confidence" interval.
 3. Reiterate what sample inference to a population actually is.
 
