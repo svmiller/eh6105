@@ -26,7 +26,7 @@
 - title: "Bivariate OLS"
   filename: bivariate-ols
   dirname: bivariate-ols
-  tldr: "In the simple bivariate case, the OLS model is just a modified slope-intercept equation. Even when you extend it forward, it's still that."
+  tldr: "In the simple bivariate case, the OLS model is just a modified slope-intercept equation. Even when you extend it forward, it's still that. There are still major assumptions that underpin what you're doing, but try not to overthink it for now."
 
 
 # #- title: "Sample .Rmd File"
