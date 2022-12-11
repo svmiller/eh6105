@@ -23,6 +23,11 @@
   dirname: hypothesis-testing
   tldr: "Applied hypothesis testing reduces to statements about the probability of the test statistic, given some assumed/fixed population parameter. It's not quite the question you're asking, but it's the answer you're getting."
 
+- title: "Bivariate OLS"
+  filename: bivariate-ols
+  dirname: bivariate-ols
+  tldr: "In the simple bivariate case, the OLS model is just a modified slope-intercept equation. Even when you extend it forward, it's still that."
+
 
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
