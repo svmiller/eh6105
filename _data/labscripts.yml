@@ -6,6 +6,10 @@
   filename: descriptive-inference
   tldr: "A lab session on things like modes, medians, means, variable types, and recoding things."
 
+- title: "Bivariate OLS"
+  filename: bivariate-ols
+  tldr: "We start a discussion of linear regression in the simple case of two variables."
+
 # - title: "Associational and Inferential Techniques"
 #   filename: association-lab
 #   tldr: "A lab session on associational techniques/limitations and a basic discussion of inference."
