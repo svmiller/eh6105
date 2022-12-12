@@ -379,7 +379,7 @@ We're not saying, for the moment, the true population mean is between those two 
 Assume we have a politician's supporter who is suspicious of our $\overline{x}$.
 
 - They claims it has to be much higher. Say: 56.61.
-    - Rationale: this is the percentage of the vote Trump in the precinct where I lived during the 2020 election.
+    - Rationale: this is the percentage of the vote Trump got in the precinct where I lived during the 2020 election.
     - In other words, they are basically inferring by anecdote or making hasty generalizations from his/her surroundings.
 
 So what can we do about this claim?
