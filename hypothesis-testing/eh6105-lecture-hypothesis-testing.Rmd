@@ -525,6 +525,6 @@ Does that look familiar? It's $p(\bar{x} | \mu)$.
 
 - But this process gives an indirect answer to the question you're asking.
 - *Within* a desired confidence interval: "I can't rule these out."
-- *Outside* a desired confidence interval: "what I got is highly unlikely if what you're proposing were actually true."
+- *Outside* a desired confidence interval: "what I got is highly unlikely if what you're proposing were actually true, given what we know from central limit theorem."
 
 Still: you'll learn more about what $\mu$ can be by assessing what it's highly unlikely to be.
