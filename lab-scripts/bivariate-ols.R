@@ -305,5 +305,5 @@ summary(M3)
 #' is zero. Assess statistical significance by whatever evidentiary threshold you choose, but the convention is .05. Don't bother interpreting
 #' "significance" for the intercept.
 #' - *other model parameters*: R-square is nice when it's high but it's not necessary for identifying causal effects. Grabbing the fitted
-#' values and residuals from the model will be useful for important diagnostics.
+#' values and residuals from the model will be useful for important diagnostics. 
 
