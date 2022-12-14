@@ -71,6 +71,47 @@ Fake
 #' everything else that influences *y* but is not included in the model. It's ultimately going to introduce
 #' noise into how well we can capture the other true parameters.
 #' 
+#' The data are fake, sure, but the process of simulating so-called "random variables" (drawn from a normal
+#' distribution with pre-defined parameters) is useful for illustrating the properties of a statistical model
+#' like this. It'll also help to show what these data "look like." Here, for example, is the distribution
+#' of *x*. When you have granularity in a variable like this (with so many trailing decimals), it's useful
+#' to jettison a bar chart or histogram (which has somewhat arbitrary bin width) in favor of the density
+#' plot. The density plot may not have the same easy takeaway as to what's happening on the *y*-axis,
+#' but it's arguably more useful for getting the basic shape of a distribution.
+#' 
+#' There are two ways of doing this. Here's the base R way.
+#' 
+plot(density(Fake$x))
+#'
+#' Here, we see the data look nice and "normal" with a clear central tendency and a shape approximating
+#' a true bell curve.
+#' 
+#' Here's the prettier ggplot way. ggplot stuff (by way of `{ggplot2}`) comes default in `{tidyverse}`.
+#' Once you load `{tidyverse}`, you load all the `{ggplot2}` functionality you could want.
+#' 
+Fake %>%
+  ggplot(.,aes(x)) +
+  geom_density() 
+#'
+#' ggplot's defaults want to draw attention to the fact that there's more a left skew than a right skew.
+#' In other words, the maximum of *x* is ~2.02 whereas the minimum is about -2.59, but the shape of the
+#' data still look normal. Any irregularities in shape could be attributed to the fact we only drew 100
+#' observations, which is fairly small set of observations (all things considered).
+#' 
+#' We can do the same thing for the outcome variable *y*.
+#' 
+plot(density(Fake$y))
+#'
+#' Also, in ggplot.
+#' 
+Fake %>%
+  ggplot(.,aes(y)) +
+  geom_density()
+#' 
+#' It's worth reiterating the *y* is "endogenously" created, and the only endogenous part of our data set.
+#' It is an outcome of two exogenous variables (*x*, which we can measure, and *e*, which serves as a plug-in
+#' for background noise in the underlying population).
+#' 
 #' Can OLS capture these known attributes about the data? We'll use the `lm()` function in R to find out.
 #' `lm()` is the base R function for estimating OLS models. It's syntax is simple, especially in a simple
 #' case like this. The two basic things you'll want to feed it are the formula, separated by a comma, then
