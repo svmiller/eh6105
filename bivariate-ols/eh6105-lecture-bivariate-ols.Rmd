@@ -67,7 +67,7 @@ options(knitr.kable.NA = '')
 
 *Use correlation and linear regression to describe the relationship between two continuous variables.*
 
-### Building Toward Normal Political Science
+### Building Toward Normal Social Science
 
 Everything we have done is building toward normal quantitative research.
 
