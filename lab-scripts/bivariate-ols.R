@@ -20,7 +20,7 @@
 #' # R Packages/Data for This Session
 #' 
 #' You should've already installed the R packages for this lab session. `{tidyverse}` will be 
-#' for all things workflow and `{stevemisc}` will create fake data
+#' for all things workflow and that's all we'll be using today.
 
 library(tidyverse)
 
