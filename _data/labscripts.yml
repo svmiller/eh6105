@@ -9,6 +9,10 @@
 - title: "Bivariate OLS"
   filename: bivariate-ols
   tldr: "We start a discussion of linear regression in the simple case of two variables."
+  
+- title: "Extending OLS"
+  filename: extending-ols
+  tldr: "Multiple regression is just OLS with more stuff glued onto it, but be mindful about what you're doing when interacting things."
 
 # - title: "Associational and Inferential Techniques"
 #   filename: association-lab

@@ -28,6 +28,11 @@
   dirname: bivariate-ols
   tldr: "In the simple bivariate case, the OLS model is just a modified slope-intercept equation. Even when you extend it forward, it's still that. There are still major assumptions that underpin what you're doing, but try not to overthink it for now."
 
+- title: "Extending OLS: Fixed Effects, Controls, and Interactions"
+  filename: ols-fixed-effects-controls
+  dirname: ols-fixed-effects-controls
+  tldr: "Multiple regression is just like bivariate regression, but with more independent variables that communicate partial effects. Fixed effects are a misleading name for 'categorical dummy variables'. *Be mindful when interacting things.*"
+
 
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
