@@ -22,7 +22,7 @@
 #' You should've already installed the R packages for this lab session. `{tidyverse}` will be 
 #' for all things workflow and `{stevedata}` will have the data sets we'll be using today. I should
 #' be transparent that we'll just be walking through how I did the analyses I put into the relevant
-#' lecture. `{stevemisc}` has a function for scaling things by a standard deviation (`r1sd()`)
+#' lecture. `{stevemisc}` has a function for scaling things by a standard deviation (`r1sd()`).
 
 library(tidyverse)
 library(stevedata)
@@ -177,12 +177,12 @@ summary(M6)
 #' - The estimated turnout in a non-swing state in the South (e.g. Alabama, Mississippi) where
 #'   no one graduated from college is 47.46. There isn't much to do with this parameter since
 #'   0 doesn't naturally occur in the `percoled` variable.
-#' - Partialling out everything else in the model ("ceteris paribus"), a one-unit increase
-#'   in the percentage of the state having a college diplooma increases turnout by .35
+#' - Partialing out everything else in the model ("ceteris paribus"), a one-unit increase
+#'   in the percentage of the state having a college diploma increases turnout by .35
 #'   percentage points. That is a significant effect too (i.e. unlikely to actually be 0).
 #' - The partial effect of being a swing state ("ceteris paribus") is to increase turnout
 #'   by about 6.54 percentage points (a significant effect).
-#' - Partialling out education effects and swing state effects, there are slight regional
+#' - Partialing out education effects and swing state effects, there are slight regional
 #'   differences compared to the South at the .10 level for the Midwest (North Central) and
 #'   Northeast. There is no difference between the West and the South.
 #'   
@@ -203,7 +203,7 @@ summary(M7)
 #' `ss:percoled` communicates a way of thinking about how the two interact with each other.
 #' 
 #' I want to use this as an illustrative case. It seems odd to think that the swing state variable is now negative,
-#' if not signficant. *But be careful*. Whatever you want to do with that parameter needs to be mindful of the fact
+#' if not significant. *But be careful*. Whatever you want to do with that parameter needs to be mindful of the fact
 #' there *is no 0* in the `percoled` variable. I use this to communicate the following: 
 #' *if you want to interact two things, each of them must have a naturally occurring 0*. Otherwise, a basic
 #' regression summary is going to be misleading. In this case, let's "standardize" the `percoled` variable by

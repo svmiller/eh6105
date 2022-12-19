@@ -1719,7 +1719,7 @@ useful for discussion around the associated R script for the week’s
 should be transparent that we’ll just be walking through how I did the
 analyses I put into the relevant lecture. <code>{stevemisc}</code> has a
 function for scaling things by a standard deviation
-(<code>r1sd()</code>)</p>
+(<code>r1sd()</code>).</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
@@ -2081,14 +2081,14 @@ created.</p>
 (e.g. Alabama, Mississippi) where no one graduated from college is
 47.46. There isn’t much to do with this parameter since 0 doesn’t
 naturally occur in the <code>percoled</code> variable.</li>
-<li>Partialling out everything else in the model (“ceteris paribus”), a
+<li>Partialing out everything else in the model (“ceteris paribus”), a
 one-unit increase in the percentage of the state having a college
-diplooma increases turnout by .35 percentage points. That is a
+diploma increases turnout by .35 percentage points. That is a
 significant effect too (i.e. unlikely to actually be 0).</li>
 <li>The partial effect of being a swing state (“ceteris paribus”) is to
 increase turnout by about 6.54 percentage points (a significant
 effect).</li>
-<li>Partialling out education effects and swing state effects, there are
+<li>Partialing out education effects and swing state effects, there are
 slight regional differences compared to the South at the .10 level for
 the Midwest (North Central) and Northeast. There is no difference
 between the West and the South.</li>
@@ -2135,7 +2135,7 @@ of state having a college diploma) for a state that is not a swing
 state. The <code>ss:percoled</code> communicates a way of thinking about
 how the two interact with each other.</p>
 <p>I want to use this as an illustrative case. It seems odd to think
-that the swing state variable is now negative, if not signficant.
+that the swing state variable is now negative, if not significant.
 <em>But be careful</em>. Whatever you want to do with that parameter
 needs to be mindful of the fact there <em>is no 0</em> in the
 <code>percoled</code> variable. I use this to communicate the following:
