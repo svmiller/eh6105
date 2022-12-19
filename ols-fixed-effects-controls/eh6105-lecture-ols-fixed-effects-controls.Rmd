@@ -111,7 +111,7 @@ M1df <- broom::tidy(M1)
 library(modelsummary)
 modelsummary(list("Model 1" = M1), output="latex",
              title = "The Effect of Being a Swing State on Voter Turnout, 2016",
-             stars = TRUE, gof_omit = "IC|F|Log.|R2$",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
              coef_map = c("ss" = "Swing State",
                           "(Intercept)" = "Intercept"),
              align = "lc")
@@ -146,7 +146,7 @@ M2df <- broom::tidy(M2)
 
 modelsummary(list("Model 1" = M2), output="latex",
              title = "The Effect of Being a Southern State on Voter Turnout, 2016",
-             stars = TRUE, gof_omit = "IC|F|Log.|R2$",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
              coef_map = c("ss" = "Swing State",
                           "south" = "State is in the South",
                           "(Intercept)" = "Intercept"),
@@ -199,7 +199,7 @@ M3df <- broom::tidy(M3)
 
 modelsummary(list("Model 1" = M3), output="latex",
              title = "The Effect of State Regions on Voter Turnout, 2016",
-             stars = TRUE, gof_omit = "IC|F|Log.|R2$",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
              coef_map = c("ss" = "Swing State",
                           "south" = "State is in the South",
                           "regionfNortheast" = "Northeast",
@@ -272,7 +272,7 @@ modelsummary(list("Swing State Model" = M1,
                   "South Model" = M2,
                   "Full Model" = M4), output="latex",
              title = "Simple Models of Voter Turnout, 2016",
-             stars = TRUE, gof_omit = "IC|F|Log.|R2$",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
              coef_map = c("ss" = "Swing State",
                           "south" = "State is in the South",
                           "percoled" = "% College Diploma",
