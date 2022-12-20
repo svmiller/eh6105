@@ -1901,11 +1901,13 @@ operator), we’re going to create a scatterplot with
 <code>geom_point()</code>. Then, using another continuation operator
 (<code>+</code>), we’re going to use <code>geom_smooth()</code> to
 create a line of best fit for the data. Importantly, you have to specify
-you want a linear smoother to communicate what a simple bivariate OLS
-case is doing. Finally, we’re going to create two lines over the plot.
-The first uses <code>geom_vline(xintercept = mean(Fake$x))</code> to add
-a vertical line through the mean of <code>x</code>. The second uses
-<code>geom_vline(yintercept = mean(Fake$y))</code> to create a
+you want a linear smoother (<code>method = &quot;lm&quot;</code>) to communicate
+what a simple bivariate OLS case is doing. The default is
+<code>method = &quot;loess&quot;</code>, which has its own nice features but it’s
+not what we want here. Finally, we’re going to create two lines over the
+plot. The first uses <code>geom_vline(xintercept = mean(Fake$x))</code>
+to add a vertical line through the mean of <code>x</code>. The second
+uses <code>geom_vline(yintercept = mean(Fake$y))</code> to create a
 horizontal line through the mean of <code>y</code>. Notice that the line
 of best fit runs through the intersection of both them.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>Fake <span class="sc">%&gt;%</span></span>

@@ -46,8 +46,15 @@ Data
 The student must read the codebooks `{peacesciencer}` for these functions in order to understand the questions, which you can do here:
 
 ```r
-?add_democracy()
+# for the functions
+# library(peacesciencer)
+?add_democracy() 
 ?add_sdp_gdp()
+
+# for the data
+?ccode_democracy # where the data for add_democracy() come from
+?cow_sdp_gdp # where add_sdp_gdp() data come from
+
 ```
 
 Answer these questions. A successful answer of these question must include the R code you used to help you answer the question.

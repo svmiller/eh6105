@@ -129,7 +129,8 @@ summary(M1)
 #' an x-axis for `x` and `y` axis for `y`. Then, using `+` (which is the `{ggplot2}` continuation operator),
 #' we're going to create a scatterplot with `geom_point()`. Then, using another continuation operator (`+`),
 #' we're going to use `geom_smooth()` to create a line of best fit for the data. Importantly, you have to 
-#' specify you want a linear smoother to communicate what a simple bivariate OLS case is doing. Finally,
+#' specify you want a linear smoother (`method = "lm"`) to communicate what a simple bivariate OLS case is doing. 
+#' The default is `method = "loess"`, which has its own nice features but it's not what we want here. Finally,
 #' we're going to create two lines over the plot. The first uses `geom_vline(xintercept = mean(Fake$x))` to
 #' add a vertical line through the mean of `x`. The second uses `geom_vline(yintercept = mean(Fake$y))` to
 #' create a horizontal line through the mean of `y`. Notice that the line of best fit runs through
