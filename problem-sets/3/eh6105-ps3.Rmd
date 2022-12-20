@@ -60,7 +60,7 @@ The student must read the codebooks `{peacesciencer}` for these functions in ord
 Answer these questions. A successful answer of these question must include the R code you used to help you answer the question.
 
 1. It is not a formal assumption of OLS that the dependent variable is normally distributed, but the normality assumption for the conditional distribution of errors wants to imply the marginal distribution of the dependent variable is also normal. Let's assume our dependent variable is `wbgdppc2011est`. Show me how you might look at the distribution of this variable for these observations. Describe it to me.
-2. Let's assume our primary independent variable for democracy is Xavier Marquez' "Quick UDS" extentions (`xm_qudsest`).  Show me how you might look at the distribution of this variable for these observations. Describe it to me.
+2. Let's assume our primary independent variable for democracy is Xavier Marquez' "Quick UDS" extensions (`xm_qudsest`).  Show me how you might look at the distribution of this variable for these observations. Describe it to me.
 3.  (2 POINTS) Let's run a naive bivariate OLS regression that regresses `wbgdppc2011est` on `xm_qudsest`. Describe the results to me.
 4. You can do a proto-bivariate OLS with `{ggplot2}` and a combination of `geom_point()` and `geom_smooth(method = "lm")`. Create a scatter plot with linear trend for our independent variable and dependent variable.
 5. Change the smoother on this scatter plot to a LOESS smoother (i.e. `geom_smooth(method = "loess")`). What do you see and what do you think this implies for the effect of democracy on economic development?
