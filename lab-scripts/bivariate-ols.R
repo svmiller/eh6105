@@ -65,7 +65,7 @@ Fake %>%
 Fake
 
 #' Here's how I want you to think about what you're going to do here. By simulating data to evaluate a model,
-#' you're creating god to see how well the model can capture the "true" parameters you're generating. The "true"
+#' you're playing god to see how well the model can capture the "true" parameters you're generating. The "true"
 #' value of *y* is 5 when *x* is 0. The "true" effect of *x* on *y* is to increase *y* by 1 for every one-unit
 #' increase in *x*. The error term here has equal footing to *x*, but recall that the error term (*e*) includes
 #' everything else that influences *y* but is not included in the model. It's ultimately going to introduce
@@ -123,11 +123,29 @@ M1 <- lm(y ~ x, data=Fake)
 summary(M1)
 
 #' Our question was whether OLS can capture the known population parameters that we created. The answer is yes. 
-#' Yes, it can. 
-#' 
+#' Yes, it can. In a simple bivariate case, you can see what this would look like visually with a scatterplot.
+#' I want you to see what this is doing. First, we're going to use our data and, with the pipe operator (`%>%`),
+#' we're going to pass the data to a `ggplot()` function with a simple aesthetic (`aes()`) argument creating
+#' an x-axis for `x` and `y` axis for `y`. Then, using `+` (which is the `{ggplot2}` continuation operator),
+#' we're going to create a scatterplot with `geom_point()`. Then, using another continuation operator (`+`),
+#' we're going to use `geom_smooth()` to create a line of best fit for the data. Importantly, you have to 
+#' specify you want a linear smoother to communicate what a simple bivariate OLS case is doing. Finally,
+#' we're going to create two lines over the plot. The first uses `geom_vline(xintercept = mean(Fake$x))` to
+#' add a vertical line through the mean of `x`. The second uses `geom_vline(yintercept = mean(Fake$y))` to
+#' create a horizontal line through the mean of `y`. Notice that the line of best fit runs through
+#' the intersection of both them.
+
+Fake %>%
+  ggplot(.,aes(x, y)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_vline(xintercept = mean(Fake$x)) +
+  geom_hline(yintercept = mean(Fake$y))
+
 #' # How to Evaluate Your OLS Model Output
 #' 
-#' Let's walk through a little bit of the important output from the model. Let's start with the "coefficients",
+#' This graph is great for visualizing a super simple bivariate case, but things are never so simple. So, let's 
+#' walk through a little bit of the important output from the model on its own terms. Let's start with the "coefficients",
 #' since they are the main reason you're doing this. We mainly wanted to know if we could capture the "true" effect
 #' of *x* on *y*. The "true" effect is 1. The OLS model says it's about 1.06. That's technically wrong, sure, but
 #' the coefficient is what it is because it's also capturing the correlation between *x* and the error term *e*, which
