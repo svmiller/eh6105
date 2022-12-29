@@ -14,6 +14,10 @@
   filename: extending-ols
   tldr: "Multiple regression is just OLS with more stuff glued onto it, but be mindful about what you're doing when interacting things."
 
+- title: "OLS Diagnostics (and What to Do if You Flunk One)"
+  filename: ols-diagnostics
+  tldr: "OLS has assumptions, and you should perform various diagnostic tests on them to see if you have any issues. If there are issues, there are assorted things you can do (depending on the problem)."
+
 # - title: "Associational and Inferential Techniques"
 #   filename: association-lab
 #   tldr: "A lab session on associational techniques/limitations and a basic discussion of inference."
