@@ -1,0 +1,602 @@
+---
+output: 
+  stevetemplates::beamer:
+    latex_engine: xelatex # use xelatex here instead! I recommend it, but this is minimal reprex
+    dev: cairo_pdf # I typically comment this out  if latex_engine: pdflatex
+    slide_level: 3 # I prefer this, but I won't force it on you.
+    theme: metropolis
+title: "OLS Diagnostics (and What to Do if You Flunk One)"
+subtitle: EH6105 -- Quantitative Methods
+author: Steven V. Miller
+institute: Department of Economic History and International Relations
+titlegraphic: "`r paste0(Sys.getenv('HOME'), '/Dropbox/stockholm/su-logotyp.png')`"
+titlegraphshift: "\\vspace{6cm}"
+make149: true
+mainfont: "Open Sans Light"
+titlefont: "Titillium Web"
+fontsize: 10pt
+header-includes:
+- \usepackage{dcolumn}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+---
+
+```{r setup, include=FALSE, cache=F, message=F, warning=F, results="hide"}
+knitr::opts_chunk$set(cache=TRUE, warning=F, message=F)
+knitr::opts_chunk$set(fig.path='figs/',  fig.width=14, fig.height=8.5)
+knitr::opts_chunk$set(cache.path='cache/')
+knitr::opts_chunk$set(cache.path='cache/',
+                      collapse = TRUE, comment = "#>")
+
+knitr::opts_chunk$set(
+                  fig.process = function(x) {
+                      x2 = sub('-\\d+([.][a-z]+)$', '\\1', x)
+                      if (file.rename(x, x2)) x2 else x
+                      }
+                  )
+```
+
+```{r loaddata, echo=F, eval=T, message=F, warning=F}
+
+library(tidyverse)
+library(stevemisc)
+library(stevedata)
+library(stargazer)
+library(modelsummary)
+library(kableExtra)
+library(lmtest)
+library(patchwork)
+
+
+options("modelsummary_format_numeric_latex" = "plain")
+options(knitr.kable.NA = '')
+
+set.seed(8675309)
+```
+
+# Introduction
+### Goal(s) for Today
+
+1. Summarize the important assumptions of OLS.
+2. Familiarize you with basic diagnostic tests you should run on every OLS model.
+3. Introduce you to what to do if you flunk a diagnostic test.
+
+### *Which* Assumptions?
+
+OLS has *lots* of assumptions.
+
+- Every definition is an assumption, which compounds matters.
+
+The problem (for us as teachers): *which* assumptions are most important?
+
+- Maximalist position: any violation is sufficient to reject the model.
+- However: violation of certain assumptions have certain *implications*.
+
+# The LINE Mnemonic for OLS Assumptions
+### A LINE Mnemonic
+
+Think of this `LINE` mnemonic for OLS' assumptions:
+
+- `L`: the outcome *y* is a *l*inear function of the right-hand side variables.
+- `I`: the errors (residuals) are *i*ndependent from each other (i.e. no autocorrelation).
+- `N`: the distribution of errors is *n*ormal
+- `E`: the variance of the errors is *e*qual/constant (i.e. no heteroskedasticity).
+
+This is roughly in order of importance.
+
+- I'd actually put `E` before `N`, but `LIEN` conjures image of debt collection.
+- That said, ask me about this one again if I catch you doing the "linear probability model."
+
+This also says nothing about the validity of the data or representativeness of the sample.
+
+- Those are assumptions too!
+
+## A Caveat About Other Assumptions
+### First, a Caveat
+
+There are typically "textbook" assumptions I want to briefly mention:
+
+1. Multicollinearity
+2. Specification ("all relevant variables")
+
+My caveat: these are important, but the problem is trivial (or your book is misleading you).
+
+### Multicollinearity
+
+**Multicollinearity** is when two right-hand side variables are so highly correlated that OLS cannot reliably return their partial effects.
+
+- *Perfect* collinearity: the model cannot be identified.
+- High collinearity: your standard errors start to explode.
+
+*Diagnostics*: correlation matrix, variance inflation factors
+
+- Correlation matrix: absolute value above .8 indicates a problem.
+- Variance inflation factor: a value above 5 typically indicates a problem.
+
+*Solution(s)*: 
+
+1. Kick one of the offending variables out.
+2. Principal components analysis (i.e. create a latent measure)
+
+
+### Specification Issues
+
+Model specification issues are often presented as "including all relevant variables" that predict *y*. Caveat:
+
+- There's no formal test for this (in the way you're thinking about it).
+
+Specification issues are only critical for adjusting for confounding. Assume three scenarios:
+
+1. `X` and `Z` both explain variation in `Y`, but `X` and `Z` have no overlap (correlation).
+2. `X` and `Z` both explain variation in `Y`, and `X` and `Z` have overlap (correlation).
+3. `X` (but not `Z`) explains variation in `Y`, and `X` and `Z` have overlap (correlation).
+
+### Specification Issue Scenarios
+
+First scenario: omitting `Z` has no bearing on "true" effect of `X` on `Y`.
+
+- Omitting `Z` will just decrease $R^2$, which is no real problem for causal identification.
+- *Ask yourself what the goal of the model is*.
+
+Second scenario: omitting `Z` biases relationship between `X` and `Y` in direction of the overlap.
+
+- Including `Z` fixes this, barring a massive collinearity problem.
+
+Third scenario: this is an instrumental variable problem (which you'll learn about in the advanced class).
+
+- Even these have their own peculiarities.
+
+## Linearity
+### Linearity
+
+OLS assumes an outcome *y* is a linear function of some predictors.
+
+- This also implies the model is *additive*.
+- Without this assumption, the model is no longer "linear."
+
+*Diagnostics*: mostly visual (esp. fitted-residual plot). But also:
+
+- Utts' (1982) "Rainbow" test
+- Harvey-Collier test
+- *ed. Neither of these are very good; just look at the data/model*.
+
+*Solutions:*
+
+- New model?
+- Logarithmic transformations 
+    - e.g. if *y = abc*, then $log(y) = log(a) + log(b) + log(c)$
+- Interactions/square terms?
+
+### An Example: Age and Happiness
+
+![](ushaped.png)
+
+### An Illustration of a Curvilinear Effect
+
+`fakeHappiness` in `{stevedata}` has an illustration of this phenomenon.
+
+- These (fake) data follow a basic form for age and happiness: `happy ~ .95*age + .01*(age^2) + controls + e`
+
+###
+
+```{r, echo=F}
+
+
+
+fakeHappiness %>%
+  ggplot(.,aes(age, happy)) + geom_point() +
+  theme_steve_web() +
+  geom_smooth(method = "lm", color="#cc0000", linetype="dashed") +
+  geom_smooth(method = "loess") +
+  labs(x = "Age", y = "(Arbitrary) Happiness Scale",
+       caption = "Data: ?fakeHappiness in {stevedata}. Data are simulated to illustrate a curvilinear relationship.",
+       title = "A Curvilinear Relationship: What OLS Wants to Say (Red) vs. What it Actually Is (Blue)",
+       subtitle = "This textbook curvilinear relationship can be fixed with a simple square term in the model.")
+```
+
+### The Fitted-Residual Plot
+
+The fitted-residual plot will point this out (and other things).
+
+- Fit the model, extract the fitted values and residuals
+- Plot the fitted values on the *x*-axis, and residuals on the *y*-axis.
+
+By definition, the linear line will be flat at 0.
+
+- You want to overlay a LOESS smoother to check for patterns.
+
+
+###
+
+```{r, echo=F}
+M1 <- lm(happy ~ age + female + collegeed + famincr + bornagain, data=fakeHappiness)
+M2 <- lm(happy ~ age + I(age^2) + female + collegeed + famincr + bornagain, data=fakeHappiness)
+
+broom::augment(M1) %>%
+  ggplot(.,aes(.fitted, .resid)) +
+  theme_steve_web() +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  geom_smooth(method = "loess") +
+  labs(x = "", y = "Residuals",
+       title = "The Top Plot is Bad; The Bottom Plot is Good",
+       subtitle = "The top plot tries to impose one age effect. The bottom outright models the square term. The fitted-residual plot on top points to a problem.") -> p1
+
+
+broom::augment(M2) %>%
+  ggplot(.,aes(.fitted, .resid)) +
+  theme_steve_web() +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  geom_smooth(method = "loess") +
+  labs(x = "Fitted Values", y = "",
+       caption = "Data: ?fakeHappiness in {stevedata}. Models include relevant controls too.") -> p2
+
+p1/p2
+```
+
+
+## Independence (i.e. No Autocorrelation)
+### (Error) Independence (or: No Autocorrelation)
+
+Another biggie: OLS assumes the data are randomly drawn from an underlying population.
+
+- The inclusion of one observation should have no bearing on the inclusion of another observation.
+- The residual value for one observation cannot depend on the residual for other data points.
+- If they do, OLS loses its inferential value.
+
+*Diagnostics*: honestly? Just know what you're doing. There are three common situations for this.
+
+1. Time series (i.e. $y$ is informed by past values of $y$)
+2. "Multilevel"/hierarchical models (i.e. individuals are clustered within higher units)
+3. Omitted variable bias (a bit harder to diagnose)
+
+*Solutions*: various, depending on the non-independence.
+
+### 
+
+```{r, echo=F}
+fakeTSD %>%
+  ggplot(.,aes(year, y)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(1920, 2020, by=10)) +
+  theme_steve_web() +
+  labs(x = "Year", y = "Dependent Variable",
+       title = "Consider This (Fake) Time Series with a Clear Linear Trend",
+       subtitle = "This time series has systematic determinants (x1 and x2), but also a clear time-dependent trajectory.",
+       caption = "Data: ?fakeTSD in {stevedata}. y = .25*year + .25*x1 + x2 + e, where x2 is binary and x1 is normal(5,2).")
+```
+
+### Time Series Diagnostics
+
+The diagnostic test for a problem here starts with estimating your linear model and doing one of two tests.
+
+- Durbin-Watson test
+- Breusch-Godfrey test
+- *ed. just do Breusch-Godfrey. Durbin-Watson is more restrictive, but has some informational value*.
+
+For both: if the *p*-value is below some threshold (e.g. .05), you have a problem.
+
+- Solutions in this case may include first-differences, lag effects, time-trends.
+- Also kind of depends on the point of the modeling process.
+
+###
+
+```{r, echo=T}
+# library(stevedata); library(lmtest)
+M1 <- lm(y ~ x1 + x2, fakeTSD)
+dwtest(M1)
+bgtest(M1)
+```
+
+## Normality (of the Errors)
+### Normality of Errors
+
+OLS assumes the distribution of residuals is normal with a mean of 0 and some variance derived from the model. Caveats:
+
+- This is *not* an assumption the DV is normal, but it does kind of imply it.
+- Says nothing about the IVs.
+- All diagnostic "tests" for this are kinda bad and are sensitive to any discreteness in the DV.
+- The implication of this violation is about the errors and not the regression line itself.
+
+*Diagnostics*: visual (Q-Q plot), and assorted normality tests (which are all bad)
+
+\hspace{3pt}
+
+*Solutions*: model the non-normality through a GLM
+
+- i.e. you're very likely trying to impose OLS on a DV with a finite set of values.
+
+
+###
+
+```{r, echo=F}
+broom::augment(M2) %>%
+  ggplot(.,aes(sample = .resid)) +
+  stat_qq() + stat_qq_line(linetype="dashed") +
+  theme_steve_web() +
+  scale_x_continuous(breaks = c(-3, -2, -1, 0, 1, 2, 3)) +
+  labs(x = "Theoretical Quantiles", y = "Standardized Residuals",
+       title = "The Q-Q Plot of Our Square-Term Age and Happiness Model",
+       subtitle = "Ideally, plotting the quantiles of residuals against the standardized residuals puts everything on a straight line")
+```
+
+
+###
+
+```{r, echo=F}
+
+broom::augment(M2) %>%
+  ggplot(.,aes(.resid)) +
+  geom_density(size = 1.1) +
+    stat_function(fun = dnorm, color="blue",
+                args = list(mean = 0, sd = sd(resid(M2))),
+                linetype="dashed", size=1.1) +
+  theme_steve_web() +
+  labs(title = "Another Way: Plot the Distribution of Residuals Against a True Normal Distribution Matching Its Description",
+       subtitle = "The real thing is always going to look kind of lumpy, but you can see just how bad any issue might be.",
+       y = "Density", x = "Distribution of Real or Stylized Residuals",
+       caption = "Black solid line is the actual ditribution of residuals. Blue-dashed line is the stylized residuals matching its description.")
+
+```
+
+## Equal Error Variance (i.e. No Heteroskedasticity)
+### Equal/Constant Error Variance (i.e. No Heteroskedasticity)
+
+OLS assumes the dispersion of the error terms does not depend on the fitted values (homoskedasticity).
+
+- If they do, the line is fine but the standard errors are wrong (in ways you don't know).
+- This has major implications for null hypothesis significance testing.
+
+*Diagnostics*: fitted-residual plot, Breusch-Pagan test
+
+\hspace{3pt}
+
+*Solutions*: more "robustness tests" comparing OLS to some other approach.
+
+- e.g. IV/DV transformations, weighted least squares, on-the-fly heteroskedasticity corrections, bootstrapping
+
+
+### A Tell-Tale Case of Heteroskedasticity
+
+Assume this simple data-generating process to illustrate heteroskedasticity.
+
+\scriptsize
+
+```{r}
+# set.seed(8675309)
+tibble(
+  x = rnorm(500, 5, 2),
+  e = rnorm(500, 0, 1),
+  y = 5 + .25*x + e
+) -> C # for constant
+
+M3 <- lm(y ~ x, C)
+
+tibble(
+  x = rnorm(500, 5, 2),
+  e = rnorm(500, 0, 1 + .25*x), # uh-oh...
+  y = 5 + .25*x + e
+) -> H # for heteroskedasticity
+
+M4 <- lm(y ~ x, H, na.action=na.exclude)
+# ^ I'm thinking ahead to those of you wanting to copy-paste code for homework.
+# If you have missing data you want to ignore, put that argument in the lm() function.
+```
+
+\normalsize
+
+###
+
+```{r, echo=F}
+modelsummary(list("C" = M3, "H"= M4), output="latex",
+             title = "Comparing Two Models With and Without Constant Error Variance",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
+             coef_map = c("x" = "Independent Variable (x)",
+                          "south" = "State is in the South",
+                          "regionfNortheast" = "Northeast",
+                          "regionfNorth Central" = "Midwest",
+                          "regionfWest" = "West",
+                          "(Intercept)" = "Intercept"),
+             align = "lcc") %>%
+  row_spec(0, bold = TRUE) %>% kable_styling(font_size = 9)
+```
+
+###
+
+```{r, echo=F}
+
+broom::augment(M3) %>%
+  mutate(model = "Constant Error Variance") %>%
+  bind_rows(., broom::augment(M4) %>% 
+              mutate(model = "Heteroskedasticity (Non-Constant Error Variance")) %>%
+  ggplot(.,aes(.fitted, .resid)) +
+  theme_steve_web() +
+  geom_point() +
+  facet_wrap(~model, scales="free", nrow=2) +
+  labs(x = "Fitted Values", y = "Residuals",
+       title = "The Top Plot is Good; The Bottom Plot is Bad",
+       subtitle = "Non-constant error variances (heteroskedasticity) results in a tell-tale 'cone of shame', making error estimates automatically suspect.",
+       caption = "Data: fake data from this lecture. See previous slides.")
+
+```
+
+### The Breusch-Pagan Test
+
+The Breusch-Pagan test (in `{lmtest}`) will tell you this as well.
+
+- *p*-value below certain threshold = heteroskedasticity
+
+```{r, echo=T}
+bptest(M3)
+bptest(M4)
+```
+
+### Approach 1: Weighted Least Squares (WLS)
+
+This procedure is a mouthful to explain, but:
+
+1. Run the offending model (which we already did). 
+2. Grab the residuals and fitted values
+3. Regress the absolute value of the residuals on the fitted values of the original model. 
+4. Extract those fitted values. 
+5. Square them, and...
+6. Divide 1 over those values. 
+7. Finally, apply those as weights in the linear model once more for a re-estimation.
+
+
+### Woof, Okay...
+
+```{r}
+# We already did step 1
+tibble(resid = resid(M4),
+       fitted = fitted(M4)) -> fitred # 2
+
+M5 <- lm(abs(resid) ~ fitted,
+         data = fitred, na.action=na.exclude) # 3
+# ^ again, be mindful about missing data you may have.
+H$wts <- 1/(fitted(M5)^2) # 4, 5, 6
+
+M6 <- lm(y ~ x, data=H, weights = wts) # 7
+
+```
+
+###
+
+```{r, echo=F}
+modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6), output="latex",
+             title = "Comparing Two Models With and Without Constant Error Variance (with Robustness Tests)",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
+             coef_map = c("x" = "Independent Variable (x)",
+                          "south" = "State is in the South",
+                          "regionfNortheast" = "Northeast",
+                          "regionfNorth Central" = "Midwest",
+                          "regionfWest" = "West",
+                          "(Intercept)" = "Intercept"),
+             align = "lccc") %>%
+  row_spec(0, bold = TRUE) %>% kable_styling(font_size = 9)
+
+```
+
+### Approach 2: Some Kind of On-the-Fly Standard Error Correction
+
+These are multiple, but `feols()` in `{fixest}` can do this easily.
+
+```{r, message =F}
+library(fixest)
+
+M7 <- feols(y ~ x, 
+            data=H, se = "hetero")
+```
+
+###
+
+```{r, echo=F}
+modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6, "H (OtF-SE)" = M7), output="latex",
+             title = "Comparing Two Models With and Without Constant Error Variance (with Robustness Tests)",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE|Std.",
+             coef_map = c("x" = "Independent Variable (x)",
+                          "south" = "State is in the South",
+                          "regionfNortheast" = "Northeast",
+                          "regionfNorth Central" = "Midwest",
+                          "regionfWest" = "West",
+                          "(Intercept)" = "Intercept"),
+             align = "lcccc") %>%
+  row_spec(0, bold = TRUE) %>% kable_styling(font_size = 9)
+
+```
+
+### Approach 3: Bootstrap!
+
+The simple bootstrap is a useful approach to assess what heteroskedasticity might be doing here.
+
+- Sample, with replacement, *M* times from the data to create *M* replicates of the original data.
+- Re-run the model on *each* of those replicates.
+- Summarize the model parameters with the mean of the estimates and standard deviation of the estimates.
+
+###
+
+\scriptsize
+
+```{r}
+set.seed(8675309)
+# Get the data from the model
+model.frame(M4) %>%
+  # draw 1000 bootstrap resamples
+  modelr::bootstrap(n = 1000) %>%
+  # estimate the model 1000 times
+  mutate(results = map(strap, ~ update(M4, data = .))) %>%
+  # extract results using `broom::tidy`
+  mutate(results = map(results, tidy)) %>%
+  # unnest and summarize
+  unnest(results) %>%
+  group_by(term) %>%
+  summarize(std.error = sd(estimate),
+            estimate = mean(estimate))
+```
+
+\normalsize
+
+
+###
+
+```{r, echo=F}
+
+tidy_custom.boot <- function(x, ...) {
+  model.frame(x) %>%
+    # draw 500 bootstrap resamples
+    modelr::bootstrap(n = 1000) %>%
+    # estimate the model 1000 times
+    mutate(results = map(strap, ~ update(x, data = .))) %>%
+    # extract results using `broom::tidy`
+    mutate(results = map(results, tidy)) %>%
+    # unnest and summarize
+    unnest(results) %>%
+    group_by(term) %>%
+    summarize(std.error = sd(estimate),
+              estimate = mean(estimate))
+}
+
+M8 <- lm(y ~ x, H)
+class(M8) = c("boot", "lm")
+
+set.seed(8675309)
+modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6, "H (OtF-SE)" = M7,
+                  "H (Bootstrap)" = M8), output="latex",
+             title = "Comparing Two Models With and Without Constant Error Variance (with Robustness Tests)",
+             stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE|Std.",
+             coef_map = c("x" = "Independent Variable (x)",
+                          "south" = "State is in the South",
+                          "regionfNortheast" = "Northeast",
+                          "regionfNorth Central" = "Midwest",
+                          "regionfWest" = "West",
+                          "(Intercept)" = "Intercept"),
+             align = "lccccc") %>%
+  row_spec(0, bold = TRUE) %>% kable_styling(font_size = 9) 
+```
+
+# Conclusion
+### Conclusion
+
+OLS has assumptions, and you should really know them.
+
+- Assumptions have varying levels of importance.
+- Violation of certain assumptions have varying implications.
+
+Important takeaways:
+
+- Get to know the fitted-residual plot, and what it can tell you.
+- Know what types of data are assuredly going to have autocorrelation.
+    - Formal diagnostics have some informational value, but you can know ahead of time if you have a problem.
+- The normality assumption is about the *errors* and not the *DV*.
+    - That said, think long and hard about what you're doing if you want to impose OLS on a Likert item or dummy variable.
+- Unequal error variances have no solution, per se.
+    - Throw more rocks at your model and see if the results meaningfully change.
