@@ -33,6 +33,10 @@
   dirname: ols-fixed-effects-controls
   tldr: "Multiple regression is just like bivariate regression, but with more independent variables that communicate partial effects. Fixed effects are a misleading name for 'categorical dummy variables'. *Be mindful when interacting things.*"
 
+- title: "OLS Diagnostics (and What to Do if You Flunk One)"
+  filename: ols-assumptions
+  dirname: ols-assumptions
+  tldr: "OLS has assumptions and you should look into them all for every model you run. Let the LINE mnemonic guide you."
 
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
