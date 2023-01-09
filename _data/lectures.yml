@@ -38,6 +38,12 @@
   dirname: ols-assumptions
   tldr: "OLS has assumptions and you should look into them all for every model you run. Let the LINE mnemonic guide you."
 
+- title: "Causality and Ethics"
+  filename: causality
+  dirname: causality
+  tldr: "We close the semester with a discussion of what is 'causality', what are its (strong) implications, and what are some issues associated with this term and research in general."
+
+
 # #- title: "Sample .Rmd File"
 # #  filename: Untitled
 # #  dirname: untitled-lecture
