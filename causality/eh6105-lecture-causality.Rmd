@@ -113,9 +113,7 @@ Think in terms of population averages.
 
 ### The Importance of Random Assignment
 
-Random assignment (to treatment/control) helps us with ATE because it's tough to imagine cases where ($Z_i = 1$ and $T_i = 0$).
-
-- Per random assignment: participants assigned to treatment/control must be same on average in the population ("equal in expectation").
+Per random assignment: participants assigned to treatment/control must be same on average in the population ("equal in expectation").
 - i.e. $E[Y_i(T_i = 0 | Z_i = 1)]$ must be equal to $E[Y_i(T_i = 0 | Z_i = 0)]$
 
 By substitution:
