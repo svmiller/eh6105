@@ -8,11 +8,11 @@
   
 - title: "Problem Set #3"
   filename: 3/eh6105-ps3
-  description: "The third problem set makes use of some data available in [`{peacesciencer}`](http://svmiller.com/peacesciencer) to learn bivariate ordinary least squares (OLS) regression."
+  description: "The third problem introduces students to simple bivariate linear regression by way of a classic chicken-and-egg problem in political science/IR: the relationship between democracy and economic development."
   
 - title: "Problem Set #4"
   filename: 4/eh6105-ps4
-  description: "The fourth problem set makes use of [some simple (American) presidential election data](http://svmiller.com/stevedata/reference/election_turnout.html) in [`{stevedata}`](http://svmiller.com/stevedata) to learn about simple derivations of the OLS model (e.g. controls, fixed effects)."
+  description: "The fourth problem set makes use of [replication data of Ghobarah et. al (2004)](http://svmiller.com/stevedata/reference/GHR04.html)) to prompt students to replicate a published analysis in the field of international relations."
   
 - title: "Problem Set #5"
   filename: 5/eh6105-ps5
