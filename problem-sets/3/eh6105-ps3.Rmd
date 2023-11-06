@@ -11,58 +11,35 @@ header-includes:
 urlcolor: blue
 ---
 
-This homework makes use of data available in `{peacesciencer}` and necessitates the use of `{tidyverse}` to at least generate the data. `{tidyverse}` is not necessary to answer these questions though it will assuredly make the process easier. Load these two libraries to get started answering these questions.
+This homework makes use of data available in `{stevedata}` and implies the use of `{tidyverse}` to at least graph the data as prompted. `{tidyverse}` is not necessary to answer these questions though it will assuredly make the process easier. Load these two libraries to get started answering these questions.
 
 ```{r, message = F}
 library(tidyverse)
-library(peacesciencer)
+library(stevedata)
 ```
 
-# Democracy and Economic Development in 2015
+# Democracy and Economic Development (Around) 1949-50
 
-This homework will deal with what is, perhaps, the biggest "chicken or egg" problem in the literature on international relations and international development. What is the relationship between democracy and economic wealth/development? There have been a lot of trees sacrificed for paper for this topic, and it's debatable what exactly causes what.[^debate] We will have to sidestep this debate completely and just roll with an assumption democracy is an independent variable of interest to us and economic development is a dependent variable so that we might learn about bivariate OLS. We are going to limit our analysis to just all sovereign states in the Correlates of War state system data in 2015.
+This homework will refer to the `Lipset59` data set that is available in `{stevedata}`. This data set roughly approximates what Lipset (1959) did in his pioneering *American Political Science Review* paper on the "modernization" thesis.[^myblog] The data include observations of 48 countries from around 1949-1950 based on an estimate of their democracy and their per capita income. You can find out more information about the data by visiting [this part of the package's website](http://svmiller.com/stevedata/reference/Lipset59.html), or with the following command.
 
-[^debate]: From one perspective: economic development is only likely to emerge when property rights are stable and governments make credible commitments to protect private property for investment (i.e. democracy precedes economic growth). From another perspective: nascent economic development creates the kind of capital necessary to challenge rulers and demand these protections in the first place (i.e. the conditions for economic development precede demands for democracy).
-
-You will have to run the following commands in R to create the data.
-
-```{r, message = F}
-# Create all state-years possible from 1816 to present, but return just 2015, and...
-create_stateyears(subset_years = 2015) %>%
-  # add assorted democracy data, and...
-  add_democracy() %>% 
-  # add some economic data from Anders et al. (2020), and
-  #  then assign to object called `Data`.
-  add_sdp_gdp() -> Data
-```
-
-
-Here's a preview of these data. Note: you won't use all these data you see here.
-
-```{r}
-Data
-```
-
-The student must read the codebooks `{peacesciencer}` for these functions in order to understand the questions, which you can do here:
+[^myblog]: You can read more about the exact argument at stake here: http://svmiller.com/blog/2023/09/democracy-income-correlation-analysis/. I offer my blog synopsis  in lieu of the article itself, though successful completion of this problem set implies an understanding of what the debate is. Implicitly, the exercise here assumes my interpretation of the relationship that Lipset (1959) first described (i.e. in the abstract, the causal sequence Lipset (1959) first described runs in reverse). 
 
 ```r
-# for the functions
-# library(peacesciencer)
-?add_democracy() 
-?add_sdp_gdp()
+?Lipset59
+```
 
-# for the data
-?ccode_democracy # where the data for add_democracy() come from
-?cow_sdp_gdp # where add_sdp_gdp() data come from
+This codebook has a discussion of what the democracy variables are communicating and you are responsible for understanding it. Here's a little preview of these data.
 
+```{r}
+Lipset59
 ```
 
 Answer these questions. A successful answer of these question must include the R code you used to help you answer the question.
 
-1. It is not a formal assumption of OLS that the dependent variable is normally distributed, but the normality assumption for the conditional distribution of errors wants to imply the marginal distribution of the dependent variable is also normal. Let's assume our dependent variable is `wbgdppc2011est`. Show me how you might look at the distribution of this variable for these observations. Describe it to me.
+1. It is not a formal assumption of OLS that the dependent variable is normally distributed, but the normality assumption for the conditional distribution of errors wants to imply the marginal distribution of the dependent variable is also normal. We need to create a per capita income variable (called: `gdppc`) that is equal to the estimate of GDP (`wbgdp2011est`) divided over the estimate of population size (`wbpopest`). Create this variable and show me how you might look at the distribution of this variable for these observations. Describe it to me in a sentence.
 2. Let's assume our primary independent variable for democracy is Xavier Marquez' "Quick UDS" extensions (`xm_qudsest`).  Show me how you might look at the distribution of this variable for these observations. Describe it to me.
-3.  (2 POINTS) Let's run a naive bivariate OLS regression that regresses `wbgdppc2011est` on `xm_qudsest`. Describe the results to me.
+3.  (2 POINTS) Let's run a naive bivariate OLS regression that regresses `gdppc` (the variable you created in the first prompt) on `xm_qudsest`. Describe the results to me.
 4. You can do a proto-bivariate OLS with `{ggplot2}` and a combination of `geom_point()` and `geom_smooth(method = "lm")`. Create a scatter plot with linear trend for our independent variable and dependent variable.
 5. Change the smoother on this scatter plot to a LOESS smoother (i.e. `geom_smooth(method = "loess")`). What do you see and what do you think this implies for the effect of democracy on economic development?
-6. It's not uncommon you'll be asked to do "robustness tests" for an independent variable of interest. We have a few other democracy indicators in the data frame as well. Regress `wbgdppc2011est` on `polity2` and describe the results to me. Make sure you understand the distribution of the independent variable.
-7. Regress `wbgdppc2011est` on `v2x_polyarchy` and describe the results to me. Make sure you understand the distribution of the independent variable.
+6. It's not uncommon you'll be asked to do "robustness tests" for an independent variable of interest. We have a few other democracy indicators in the data frame as well. Regress `gdppc` on `polity2` and describe the results to me. Make sure you understand the distribution of the independent variable.
+7. Regress `gdppc` on `v2x_polyarchy` and describe the results to me. Make sure you understand the distribution of the independent variable.

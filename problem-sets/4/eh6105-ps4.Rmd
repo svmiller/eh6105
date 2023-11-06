@@ -19,28 +19,27 @@ library(stevedata)
 ```
 
 
-# State-Level Education and (U.S.) Voter Turnout in 2016
+# Comparative Public Health: The Political Economy of Human Misery and Well-Being
 
-This homework will refer to the `election_turnout` data set that is available in `{stevedata}`. I created this data set in early 2017 largely for pedagogical purposes like this, allowing students to fit more complex OLS models with a still simple and intuitive application. The topic here is about Donald Trump's share of the vote in the 2016 presidential election for all 51 voting units in the United States (i.e. all 50 states + the District of Columbia). You can find out more information about the data by visiting [this part of the package's website](http://svmiller.com/stevedata/reference/election_turnout.html), or with the following command.[^anotherhint]
+This homework will refer to the `GHR04` data set that is available in `{stevedata}`. This data set is capable of (almost perfectly) recreating the analyses done by Ghobarah et al. (2004).[^citation] You can find out more information about the data by visiting [this part of the package's website](http://svmiller.com/stevedata/reference/GHR04.html), or with the following command.
+
+[^citation]: Ghobarah, Hazem Adam, Paul Huth, and Bruce Russett. 2004. "Comparative Public Health: The Political Economy of Human Misery and Well-Being" *International Studies Quarterly* 48: 73-94. The authors make these data available but not a script that is more explicit about what exactly they are doing. Thus, the replication here is basically total but not perfect/identical. Students are responsible for reading this article in order to make sense of what is being asked in this problem set.
 
 ```r
-?election_turnout
+?GHR04
 ```
-
-[^anotherhint]: The codebook isn't as clear as it should be about the `sunempr12md` variable, but I'll communicate here that higher values of this variable indicate there was more state-level unemployment relative to the previous point 12 months prior. For example, the state-level unemployment rate in Ohio for Nov. 2015 was 4.8%. In Nov. 2016: 5.2%. That is an increase of .4, which is what you see for `sunempr12md` for that observation.
-
 
 Here's a little preview of these data.
 
 ```{r}
-election_turnout
+GHR04
 ```
 
-Answer these questions. A successful answer of these question must include the R code you used to help you answer the question.
+Answer these questions. This particular homework may seem brutal because it will demand that you read the Ghobarah et al. (2004) article (see footnote citation) and look *carefully* at the codebook for this data set.
 
-1. This is less of a question and more of a command. The `trumpshare` variable is a proportion and not a percent. How would you create a new variable---call it `trumpshareperc`--- that converts this proportion to a percent as a new column in this data set? Make sure you do that before proceeding.
-2. Donald Trump once (in)famously boasted "I love the poorly educated", which suggested he may have done better in states with lower levels of educational attainment. Regress the `trumpshareperc` variable you just created as a dependent variable on the `percoled` variable in the data set. Describe what you see in substantive terms.
-3.  One common refrain about the 2016 presidential election is that "economic anxiety" can account for why enough Americans rejected the incumbent Democrats in favor of the demagoguery of Donald Trump. We can perhaps estimate that concept with the `sunempr12md` variable in this data set. Re-run the regression you just ran above, but add this `sunempr12md` to the right-hand side of the formula. Explain the results to me.
-4. There are four Census regions in the United States in which states are located. There is the North Central (Midwest) (e.g. Ohio, Illinois), the Northeast (e.g. New York, Massachusetts), the South (e.g. Florida, Georgia), and the more diverse and varied West (e.g. California, Utah). Run a "fixed effects" regression that regresses the `trumpshareperc` variable you created on just the `region` variable included in the data. Interpret the results to me, and *be careful* in how you describe them.
-5. (2 POINTS) Take the same regression model you ran in the previous question and add in the `percoled` and `sunempr12md` variables. Interpret the results to me, and *be careful* in how you describe them.
-6. (2 POINTS) Time for a teachable moment on regression intercepts. In the above regression, the intercept is "statistically significant." What is that value for the intercept actually communicating? Does it make sense?
+1. (2 POINTS) Using the data set provided to you, and the `lm()` function in base R, reproduce Table I (for which public health expenditures as a percent of GDP is the dependent variable). A successful answer will involve both code and console output. 
+2. (2 POINTS) Using the data set provided to you, and the `lm()` function in base R, reproduce Table II (for which total expenditures on health is the dependent variable). A successful answer will involve both code and console output.
+3. (2 POINTS) Using the data set provided to you, and the `lm()` function in base R, reproduce Table III (for which health-adjusted life expectancy is the dependent variable). A successful answer will involve both code and console output.
+4. (2 POINTS) Answer one of the following prompts:
+    a. For the regression model on health-adjusted life expectancy, re-run the model (but omit Rwanda from the analysis). Show me the code you used to do this and highlight any differences in sign/significance you see comparing this model to the model above.
+    b. In the regression model you estimated for Question 3, the intercept is "statistically significant." What is that value for the intercept actually communicating? Does it make sense?
