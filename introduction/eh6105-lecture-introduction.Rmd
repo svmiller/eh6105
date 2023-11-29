@@ -50,6 +50,7 @@ knitr::opts_chunk$set(cache=TRUE)
 options(knitr.kable.NA = '')
 library(tidyverse)
 library(stevemisc)
+library(stevethemes)
 # library(peacesciencer)
 # library(fixest)
 library(kableExtra)
@@ -63,29 +64,59 @@ options(knitr.kable.NA = '')
 
 ```{r loaddata, cache=F, eval=T, echo=F, message=F, error=F, warning=F}
 library(lubridate)
-mon <- ymd(20221128)
-semester_dates <- seq(ymd(20221201), ymd(20230109), by=1)
-seminar_dates <- c(ymd(20221201), ymd(20221202),
-                   ymd(20221205), ymd(20221208),
-                   ymd(20221212), ymd(20221212),
-                   ymd(20221214), ymd(20221220),
-                   ymd(20230102), ymd(20230109))
-lab_dates <- c(ymd(20221206), ymd(20221209),
-               ymd(20221220), ymd(20221222),
-               ymd(20230104))
-problem_set_dates <- c(ymd(20221207),
-                       ymd(20221213),
-                       ymd(20221221),
-                       ymd(20221223),
-                       ymd(20230105))
+
+mon <- ymd(20231127)
+semester_dates <- seq(ymd(20231101), ymd(20240131), by=1)
+
+seminar_dates <- c(
+  ymd(20231130),
+  ymd(20231201),
+  ymd(20231205),
+  ymd(20231208),
+  # ymd(20231210),
+  ymd(20231213),
+  ymd(20231215),
+  ymd(20231221),
+  ymd(20240108),
+  ymd(20240112)
+)
+
+lab_dates <- c(
+  ymd(20231207), #x2
+  ymd(20231211), #x2
+  ymd(20231222), #x2
+  ymd(20240103), #x2
+  ymd(20240104), #x2
+  ymd(20240110)  #x2
+)
+
+final_thing_due <- ymd(20240112)
+
+problem_set_dates <- c(
+  ymd(20231209),
+  ymd(20231212),
+  ymd(20231223),
+  ymd(20240105),
+  ymd(20240111)
+)
 
 
-tibble(date = seq(ymd(20221201), ymd(20230131), by=1)) %>%
+# seminar_dates <- c(ymd(20230929), ymd(20231009), ymd(20231018))
+# lab_dates <- c(ymd(20231003), ymd(20231006),
+#                ymd(20231016), ymd(20231023),
+#                ymd(20231027))
+# problem_set_dates <- lab_dates + 1
+# problem_set_dates[1:4] -> problem_set_dates
+# rs_dates <- c(ymd(20231010), ymd(20231021))
+
+tibble(date = semester_dates) %>%
   mutate(mon = lubridate::month(date, label=T, abbr=F), # get month label
          mon = fct_relevel(mon, "November", "December", "January"),
          wkdy = weekdays(date, abbreviate=T), # get weekday label
-         wkdy = fct_relevel(wkdy, "Sun", "Mon", "Tue", "Wed", "Thu","Fri","Sat"), # make sure Sunday comes first
-         week = wom(date),
+         wkdy = fct_relevel(wkdy, "Mon", "Tue", "Wed", "Thu","Fri","Sat"), # make sure Sunday comes first
+         #week = wom(date),
+         week = isoweek(date) - week(floor_date(date, unit = "months",
+                                     week_start = 1)) + 1,
          semester = ifelse(date %in% semester_dates, 1, 0),
          lab = ifelse(date %in% lab_dates, 1, 0),
          day = lubridate::mday(date), # get day of month to add later as a label,
@@ -94,33 +125,34 @@ tibble(date = seq(ymd(20221201), ymd(20230131), by=1)) %>%
            #date %in% semester_dates ~ "Semester",
            date %in% seminar_dates ~ "Seminar",
            date %in% lab_dates ~ "Lab",
+           #date %in% rs_dates ~ "Reading Summary Due",
            date %in% problem_set_dates ~ "Problem Set Due",
            TRUE ~ "NA",
          ),
-         category = ifelse(date == ymd(20221220), "Seminar/Lab", category),
-         category = ifelse(date == ymd(20230113), "Final Exam Due", category)) %>%
+         category = ifelse(date == final_thing_due, "Final Exam Due", category)) %>%
   ggplot(.,aes(wkdy, week)) +
   # custom theme stuff below
   # theme_steve_web() +
-  theme_steve_web() +
+  theme_steve(style='ms') +
   theme(panel.grid.major.x = element_blank()) +
   # geom_tile and facet_wrap will do all the heavy lifting
-  geom_tile(alpha=0.8, aes(fill=category), color="black", size=.45) +
+  geom_tile(alpha=0.8, aes(fill=category), color="black", linewidth=.45) +
   facet_wrap(~mon, scales="free", ncol=3) +
   # fill in tiles to make it look more "calendary" (sic)
-  geom_text(aes(label=day),family="Open Sans") +
+  geom_text(aes(label=day),family="Crimson Text") +
   # put your y-axis down, flip it, and reverse it
   scale_y_reverse(breaks=NULL) +
   scale_fill_manual(values=c("Seminar"="#dfc27d",
                              "Lab"="#bf812d",
-                             "Seminar/Lab"="#8c510a",
+                             #"Seminar/Lab"="#8c510a",
                              "Problem Set Due" = "#80cdc1",
-                             "Final Exam Due" = "#01665e",
+                             "Final Exam Due" = "#415357",
+                             "Reading Summary Due" = "#01665e",
                              "NA" = "white" # I like these whited out...
                              ),
-                    breaks=c("Seminar","Lab", "Seminar/Lab", "Problem Set Due", "Final Exam Due")) +
+                    breaks=c("Seminar","Lab", "Seminar/Lab", "Problem Set Due", "Reading Summary Due", "Final Exam Due")) +
   labs(x = "", y = "",fill="",
-       caption = "All problem sets (and the final exam) are due *before* 8 p.m. on that corresponding day.\nDo note that Dec. 20 is both a seminar and lab day. Check the syllabus and TimeEdit for more.") -> class_cal
+       caption = "All problem sets (and the final exam) are due *before* 5 p.m. on that corresponding day. Please check TimeEdit as well for confirmation of the schedule summarized here.")  -> class_cal
 ```
 
 # Introduction
@@ -247,7 +279,7 @@ For Linux users:
 
 For Chromebook/tablet users:
 
-- You'll have to use the computer lab. There's no way around this.
+- It may be best to use the computer lab.
 
 *I'll assume silence on any issues with R means the absence of any problem.*
 
@@ -263,7 +295,6 @@ Note: download the free version. Don't ever pay for anything related to R.
 ```{r, eval=F, echo=T}
 install.packages("tidyverse")      # for most things workflow
 # ^ This is a huge installation. It should take a while.
-install.packages("peacesciencer")  # some peace science data
 install.packages("stevedata")      # for toy data sets to use in-class
 install.packages("stevemisc")      # for some helper functions
 install.packages("stevetemplates") # for preparing reports
@@ -277,7 +308,7 @@ Note: you'll only need to install a package once, but you'll need to load it eve
 # Conclusion
 ### Conclusion
 
-Welcome to the semester!
+Welcome to the course!
 
 - Read the syllabus.
 - Get acclimated with the course website (`eh6105.svmiller.com`)
