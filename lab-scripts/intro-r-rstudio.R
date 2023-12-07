@@ -105,18 +105,17 @@ d <- pi # you can assign one built-in object to a new object.
 # pi <- 3.14 # don't do this....
 
 #' If you do something dumb (like overwrite `TRUE` with something), all hope is not lost. 
-#' However, your session is. Restart R and you'll reclaim some built-in object that you overwrote.
+#' Just remove the object in question with the `rm()` command.
 #' 
 #' ## Install/Load Libraries
 #' 
 #' R depends on user-created libraries to do much of its functionality. This class will lean on just a 
 #' few R libraries. The first, `{tidyverse}` is our workhorse for workflow. It'll also be 
 #' the longest to install because it comes with lots of dependencies to maximize its 
-#' functionality. The second, `{peacesciencer}`, is [a new project of mine](http://svmiller.com/peacesciencer/) 
-#' for more seamlessly loading and playing with data in widespread use in international conflict research.
-#' [`{stevedata}`](http://svmiller.com/stevedata) contains toy data sets that I use for in-class
-#' instruction, and we'll make use of these data in these lab sessions (and in your 
-#' problem sets). [`{stevemisc}`](http://svmiller.com/stevemisc) contains assorted helper functions
+#' functionality. [`{stevedata}`](http://svmiller.com/stevedata) contains toy 
+#' data sets that I use for in-class instruction, and we'll make use of these 
+#' data in these lab sessions (and in your problem sets). 
+#' [`{stevemisc}`](http://svmiller.com/stevemisc) contains assorted helper functions
 #' that I wrote for my research, which we'll also use in this class. 
 #' [`{stevetemplates}`](http://svmiller.com/stevetemplates)  is not strictly necessary, 
 #' but it will make doing your homeworks infinitely easier (even if you're not a LaTeX user).
@@ -154,18 +153,20 @@ d <- pi # you can assign one built-in object to a new object.
 #' no longer an `.R` file (and, duh, just tell it to save anyway). Afterwards, restart Rstudio and try
 #' again. This *should* fix it, based on my recent trial run in the university's computer labs.
 #' 
-#' For you Linux users: you're awesome, have great hair, everyone likes you, and you don't need to worry about a thing, *except* the various
-#' developmental libraries you may have to install from your package repository. My flavor of Linux
-#' is in the Debian/Ubuntu family, so 
+#' For you Linux users: you're awesome, have great hair, everyone likes you, and 
+#' you don't need to worry about a thing, *except* the various developmental 
+#' libraries you may have to install from your package repository. My flavor of 
+#' Linux is in the Debian/Ubuntu family, so 
 #' [here's an (incomplete) list of developmental libraries](http://svmiller.com/blog/2019/07/notes-to-self-new-linux-installation-r-ubuntu/) 
-#' based on my experience. Helpfully, most R packages that fail this way will tell you what development library you need,
-#' whether in you're in the Debian or Red Hat family.
+#' based on my experience. Helpfully, most R packages that fail this way will 
+#' tell you what development library you need, whether in you're in the Debian 
+#' or Red Hat family.
 #' 
 #' 
 #' If you have yet to install these packages (and you almost certainly have not if you're opening R for the first time), install it as follows.
 #' Note that I'm just commenting out this command so it doesn't do this when I compile this script on my end. 
 # Take out the comment...
-# install.packages(c("tidyverse","peacesciencer", "stevedata", "stevemisc", "stevetemplates", "lmtest"))
+# install.packages(c("tidyverse", "stevedata", "stevemisc", "stevetemplates", "lmtest"))
 
 #' Once they're all installed, you can load the libraries with the `library()` command. 
 #' Of note: you only need to install a package once, but you'll need to load the library 
@@ -176,14 +177,27 @@ d <- pi # you can assign one built-in object to a new object.
 library(tidyverse)
 library(stevedata)
 
+#' For those of you that are having `{tidyverse}` installation issues because of
+#' `{systemfonts}` needing some font-related development libraries, try this:
+#' 
+library(tibble)    # special data type we'll use
+library(magrittr)  # pipe operator
+library(dplyr)     # the workhorse
+library(readr)     # for reading particular data types.
+library(stevedata) # for data
+
+#' These are the core packages that are in `{tidyverse}` that you should have 
+#' installed. Having `{tidyverse}` loads all of these. It's basically a wrapper.
+#' Here, you're just being explicit.
 
 #' ## Load Data
 #' 
-#' Problem sets and lab scripts will lean on data I make available in `{stevedata}`, or that you can
-#' create for yourself in `{peacsciencer}`. However, you may often find that you want to download a
-#' data set from somewhere else and load it into R. Example data sets would be stuff like European Values
-#' Survey, European Social Survey, or Varieties of Democracy, or whatever else. You can do this any 
-#' number of ways, and it will depend on what is the file format you downloaded. Here are some 
+#' Problem sets and lab scripts will lean on data I make available in `{stevedata}`. 
+#' However, you may often find that you want to download a data set from 
+#' somewhere else and load it into R. Example data sets would be stuff like 
+#' European Values Survey, European Social Survey, or Varieties of Democracy, or 
+#' whatever else. You can do this any number of ways, and it will depend on 
+#' what is the file format you downloaded. Here are some 
 #' commands you'll want to learn for these circumstances:
 #' 
 #' - `haven::read_dta()`: for loading Stata .dta files
@@ -193,24 +207,23 @@ library(stevedata)
 #' - `read_tsv()`: for tab-separated values (TSV) files
 #' - `readRDS()`: for R serialized data frames, which are awesome for file compression/speed.
 #' 
-#' Notice that functions like `read_dta()`, `read_spss()`, and `read_excel()` require some other packages
-#' that I didn't mention. However, these other packages/libraries are part of the `{tidyverse}` and are just 
-#' not loaded directly with them. Under these conditions, you can avoid directly loading a library into a session
-#' by referencing it first and grabbing the function you want from within it separated by two colons (`::`). 
-#' Basically, `haven::read_dta()` could be interpreted as a command saying "using the `{haven}` library, grab the 
-#' `read_dta()` command in it". 
+#' Notice that functions like `read_dta()`, `read_spss()`, and `read_excel()` 
+#' require some other packages that I didn't mention. However, these other 
+#' packages/libraries are part of the `{tidyverse}` and are just not loaded 
+#' directly with them. Under these conditions, you can avoid directly loading a 
+#' library into a session by referencing it first and grabbing the function 
+#' you want from within it separated by two colons (`::`). Basically, 
+#' `haven::read_dta()` could be interpreted as a command saying "using the 
+#' `{haven}` library, grab the `read_dta()` command in it". 
 #' 
 #' These wrappers are also flexible with files on the internet. For example, these will work. 
 #' Just remember to assign them to an object.
 
 # Note: hypothetical data
 Apply <- haven::read_dta("https://stats.idre.ucla.edu/stat/data/ologit.dta")
-# State-level (seasonally adjusted) unemployment in the United States.
-Sunemp <- read_tsv("https://download.bls.gov/pub/time.series/la/la.data.3.AllStatesS") 
 
 # Let's take a look at these data.
 Apply
-Sunemp
 
 #' ## Learn Some Important R/"Tidy" Functions
 #' 
@@ -280,14 +293,15 @@ pwt_sample %>% select(-labsh) # grab everything, but drop the labsh variable.
 pwt_sample %>% select(country, year, rgdpna) # grab just these three columns.
 
 
-#' ### `group_by()`
+#' ### Grouping data for grouped functions (`group_by()`, or `.by=`)
 #' 
 #' I think the pipe is probably the most important function in the `{tidyverse}` even as 
 #' a critical reader might note that the pipe is 1) a port from another package (`{magrittr}`) 
 #' and 2) now a part of base R in a different terminology. Thus, the critical reader 
-#' (and probably me, depending on my mood) may note that `group_by()` is probably the 
-#' most important component of the `{tidyverse}`. Basically, `group_by()` allows you to 
-#' "split" the data into various subsets, "apply" various functions to them, and 
+#' (and probably me, depending on my mood) may note that grouping functions---
+#' whether through `group_by()` or `.by`---is probably the  most important 
+#' component of the `{tidyverse}`. Basically, `group_by()` allows you to "split" 
+#' the data into various subsets, "apply" various functions to them, and 
 #' "combine" them into one output. You might see that terminology "split-apply-combine" 
 #' as you learn more about the `{tidyverse}` and its development.
 #' 
@@ -314,8 +328,21 @@ pwt_sample %>%
 #' need just once), it's generally advisable to "ungroup()" (i.e. `ungroup()`) as the 
 #' next function in your pipe chain. As you build together chains/pipes, the intermediate 
 #' output you get will advise you of any "groups" you've declared in your data. Don't
-#' lose track of those.
+#' lose track of those. This is incidentally why the `{tidyverse}` effectively
+#' "retired" the `group_by()` function for `.by` as an argument in these functions.
+#' `.by` will always return un-grouped data whereas `group_by()` always returns
+#' grouped data.
 #' 
+#' Observe:
+pwt_sample %>%
+  # group by country
+  group_by(country) %>%
+  # Get me the first observation, by group.
+  slice(1)
+
+pwt_sample %>%
+  slice(1, .by=country)
+
 #' ### `summarize()`
 #' 
 #' `summarize()` creates condensed summaries of your data, for whatever it is 
@@ -326,13 +353,20 @@ pwt_sample %>%
   # How many observations are in the data?
   summarize(n = n())
 
-#' More importantly, `summarize()` works wonderfully with `group_by()`. For example, 
-#' for each country (`group_by(country)`), let's get the maximum GDP observed in the data.
+#' More importantly, `summarize()` works wonderfully with `group_by()` or `.by=`. 
+#' For example, for each country (`group_by(country)`), let's get the 
+#' maximum GDP observed in the data.
 
 pwt_sample %>%
   group_by(country) %>%
   # Give me the max real GDP observed in the data.
   summarize(maxgdp = max(rgdpna, na.rm=T))
+
+#' `.by` does the same here.
+
+pwt_sample %>%
+  # Give me the max real GDP observed in the data, .by country.
+  summarize(maxgdp = max(rgdpna, na.rm=T), .by=country)
 
 #' One downside (or feature, depending on your perspective) to `summarize()` is that it 
 #' condenses data and discards stuff that's not necessary for creating the condensed output. 
@@ -349,23 +383,33 @@ pwt_sample %>%
   # translated: give me the row, for each country, in which real GDP is the max (ignoring missing values).
   slice(which(rgdpna == max(rgdpna, na.rm=T)))
 
+# or...
+
+pwt_sample %>%
+  # translated: give me the row, for each country, in which real GDP is the max (ignoring missing values).
+  slice(which(rgdpna == max(rgdpna, na.rm=T)), .by=country)
+
 #' This is a convoluted way of thinking about `summarize()`, but you'll probably 
 #' find yourself using it a lot.
 #' 
 #' ### `mutate()`
 #' 
-#' `mutate()` is probably the most important `{tidyverse}` function for data management/recoding. 
-#' It will allow you to create new columns while retaining the original dimensions of the data. 
-#' Consider it the sister function to `summarize()`. But, where `summarize()` discards, 
+#' `mutate()` is probably the most important `{tidyverse}` function for data 
+#' management/recoding.  It will allow you to create new columns while 
+#' retaining the original dimensions of the data. Consider it the sister 
+#' function to `summarize()`. But, where `summarize()` discards, 
 #' `mutate()` retains.
 #' 
-#' Let's do something simple with `mutate()`. For example, the `rgdpna` column is real GDP in million 2017 USD. 
-#' What if we wanted to convert that million to billions? This is simple with `mutate()`. Helpfully, 
-#' you can create a new column that has both the original/raw data and a new/recoded variable. This is great 
-#' for reproducibility in your data management. One thing I will want to reiterate to you through our sessions
-#' is you should *never* overwrite raw data you have. Always create new columns if you're recoding something.
+#' Let's do something simple with `mutate()`. For example, the `rgdpna` column 
+#' is real GDP in million 2017 USD. What if we wanted to convert that 
+#' million to billions? This is simple with `mutate()`. Helpfully, you can create 
+#' a new column that has both the original/raw data and a new/recoded variable. 
+#' This is great for reproducibility in your data management. One thing I will 
+#' want to reiterate to you through our sessions is you should *never* overwrite 
+#' raw data you have. Always create new columns if you're recoding something.
 #' 
-#' Anyway, here's "Wonderw-"... sorry, here's that new real GDP in billions variable we wanted.
+#' Anyway, here's "Wonderw-"... sorry, here's that new real GDP in billions 
+#' variable we wanted.
 
 
 pwt_sample %>%
@@ -374,9 +418,9 @@ pwt_sample %>%
   # select just what we want for presentation
   select(country:year, rgdpna, rgdpnab)
 
-#' Let's assume we wanted to create a dummy variable for observations in the data starting from the 
-#' Great Recession forward? In other words, let's create a dummy variable for all observations that were in 2008
-#' or later. 
+#' Let's assume we wanted to create a dummy variable for observations in the 
+#' data starting from the Great Recession forward? In other words, let's create 
+#' a dummy variable for all observations that were in 2008 or later. 
 
 pwt_sample %>%
   mutate(post_recession = ifelse(year >= 2008, 1, 0))  %>%
@@ -388,50 +432,53 @@ pwt_sample %>%
   mutate(post_recession = ifelse(year %in% c(2008:2019), 1, 0)) %>%
   select(country:year, post_recession)
 
-#' Economists typically care about GDP per capita, right? We can create that kind of data ourselves
-#' based on information that we have in `pwt_sample`.
+#' Economists typically care about GDP per capita, right? We can create that 
+#' kind of data ourselves based on information that we have in `pwt_sample`.
 
 pwt_sample %>%
   mutate(rgdppc = rgdpna/pop) %>%
   select(country:year, rgdpna, pop, rgdppc)
 
-#' Notice that `mutate()` also works beautifully with `group_by()`. For example, you may recognize
-#' that these data are panel data. We have 21 countries (cross-sectional units) across 70 years (time units). If you don't
-#' believe me, check this out...
+#' Notice that `mutate()` also works beautifully with `group_by()`. For example, 
+#' you may recognize that these data are panel data. We have 21 countries 
+#' (cross-sectional units) across 70 years (time units). If you don't believe 
+#' me, check this out...
 #' 
 pwt_sample %>% 
-  group_by(country) %>%
   summarize(n = n(),
             min = min(year),
-            max = max(year)) %>%
+            max = max(year),
+            .by=country) %>%
   data.frame
 
-#' You might know---or should know, as you progress---that some panel methods look for "within"
-#' effects inside cross-sectional units by looking at the value of some variable relative to the 
-#' cross-sectional average for that variable. Let's use the real GDP per capita variable we can
-#' create as an example. Observe what's going to happen here.
+#' You might know---or should know, as you progress---that some panel methods 
+#' look for "within" effects inside cross-sectional units by looking at the 
+#' value of some variable relative to the cross-sectional average for that 
+#' variable. Let's use the real GDP per capita variable we can create as an 
+#' example. Observe what's going to happen here.
 
 pwt_sample %>%
   mutate(rgdppc = rgdpna/pop) %>%
   select(country:year, rgdpna, pop, rgdppc) %>%
-  group_by(country) %>%
   mutate(meanrgdppc = mean(rgdppc),
-         diffrgdppc = rgdppc - mean(rgdppc)) %>%
-  ungroup() # practice safe group-by
+         diffrgdppc = rgdppc - mean(rgdppc),
+         .by=country) 
 
-#' That `diffrgdppc` variable practically "centers" the real GDP per capita variable, and values communicate
-#' difference from the mean. This is a so-called "within" variable, or a transformation of a variable where
+#' That `diffrgdppc` variable practically "centers" the real GDP per capita 
+#' variable, and values communicate difference from the mean. This is a 
+#' so-called "within" variable, or a transformation of a variable where
 #' it now communicates changes of some variable "within" a cross-sectional unit.
 #' 
 #' ### `filter()`
 #' 
-#' `filter()` is a great diagnostic tool for subsetting your data to look at particular observations. 
-#' Notice one little thing, especially if you're new to programming. The use of double-equal signs 
-#' (`==`) is for making logical statements where as single-equal signs (`=`) is for 
-#' object assignment or column creation. If you're using `filter()`, you're probably 
-#' wanting to find cases where something equals something (`==`), is greater than something (`>`), 
-#' equal to or greater than something (`>=`), is less than something (`<`), or is less than or equal 
-#' to something (`<=`).
+#' `filter()` is a great diagnostic tool for subsetting your data to look at 
+#' particular observations. Notice one little thing, especially if you're new to 
+#' programming. The use of double-equal signs (`==`) is for making logical 
+#' statements where as single-equal signs (`=`) is for object assignment or 
+#' column creation. If you're using `filter()`, you're probably wanting to find 
+#' cases where something equals something (`==`), is greater than something (`>`), 
+#' equal to or greater than something (`>=`), is less than something (`<`), or 
+#' is less than or equal to something (`<=`).
 #' 
 #' Here, let's grab just the American observations by filtering to where `isocode` == "USA".
 
@@ -450,16 +497,20 @@ pwt_sample %>%
 #' 
 #' ## Don't Forget to Assign!
 #' 
-#' When you're done applying functions/doing whatever to your data, don't forget to assign what 
-#' you've done to an object. For simple cases, and for beginners, I recommend  thinking "left-handed" 
-#' and using `<-` for object assignment (as we did above). When you're doing stuff in the pipe, my 
-#' "left-handed" thinking prioritizes the starting data
-#' in the pipe chain. Thus, I tend to use `->` for object assignment at the end of the pipe.
+#' When you're done applying functions/doing whatever to your data, don't forget 
+#' to assign what you've done to an object. For simple cases, and for beginners, 
+#' I recommend  thinking "left-handed"  and using `<-` for object assignment 
+#' (as we did above). When you're doing stuff in the pipe, my "left-handed" 
+#' thinking prioritizes the starting data in the pipe chain. Thus, I tend to 
+#' use `->` for object assignment at the end of the pipe.
 #' 
-#' Consider a simple example below. I'm starting with the original data (`pwt_sample`). 
-#' I'm using a simple pipe to create a new variable (within `mutate()`) that standardizes
-#' the real GDP variable from millions to billions. Afterward, I'm assigning it to a new object (`Data`) with `->`.
+#' Consider a simple example below. I'm starting with the original data 
+#' (`pwt_sample`). I'm using a simple pipe to create a new variable 
+#' (within `mutate()`) that standardizes the real GDP variable from millions to 
+#' billions. Afterward, I'm assigning it to a new object (`Data`) with `->`.
 
 pwt_sample %>%
   # convert real GDP to billions
   mutate(rgdpnab = rgdpna/1000) -> Data
+
+Data
