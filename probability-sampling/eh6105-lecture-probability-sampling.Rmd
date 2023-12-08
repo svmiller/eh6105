@@ -296,7 +296,7 @@ Pinker (2011) argues the absence of world wars since WW2 shows a decline of viol
 ### The Decline of War?
 
 
-The year is 2022. We haven't observed a World War II in, basically, 75 years. What is the probability of us *not* observing this where:
+The year is 2023. We haven't observed a World War II in, basically, 75 years. What is the probability of us *not* observing this where:
 
 - *p* = .042, the overall base rate of war vs. not-war?
 - *p* = .012, the overall base rate of a "really big war"?
