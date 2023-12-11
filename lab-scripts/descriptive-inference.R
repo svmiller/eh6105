@@ -26,6 +26,16 @@
 library(stevedata)
 library(tidyverse)
 
+#' One of you has an issue with `{tidyverse}`  because of `{systemfonts}`. These
+#' are basically the packages we'll be using today with that in mind. I won't
+#' load them in this script, but you should "uncomment" (sic) them and load
+#' them into your session.
+
+# library(dplyr)
+# library(tidyr)
+# library(magrittr)
+# library(ggplot2)
+
 #' In your R session, please look up the documentation for the data set to get a better 
 #' idea as to what each variables are. Here's how I want you to think about this.
 #' You the smart researcher know that the `race` column in `gss_spending` is a 
@@ -87,6 +97,8 @@ getmode <- function(v) {
 
 getmode(gss_spending$race)
 
+gss_spending %>% summarize(mode = getmode(race))
+
 #' This tells us that there are more white people in the sample than there are 
 #' people identifying with any other race. This is not surprising. 
 #' [We already know](https://www.census.gov/quickfacts/fact/table/US/PST045219)
@@ -97,11 +109,8 @@ getmode(gss_spending$race)
 #' For example, here's a "tidy" approach that leans on `group_by()` and `count()`.
 #' 
 gss_spending %>%
-  group_by(race) %>%
-  count() %>%
+  count(race) %>%
   # ^ you could stop here, but let's have more fun.
-  # First: practice safe group_by()
-  ungroup() %>%
   # create more information...
   mutate(race_lab = c("White", "Black", "Other"),
          prop = n/sum(n)) %>%
@@ -109,15 +118,14 @@ gss_spending %>%
   select(race, race_lab, everything())
 
 #' You could also graph this information. Do note I encourage using a fancier 
-#' `{ggplot2}` theme (like my `theme_steve_web()`) in `{stevemisc}`,
+#' `{ggplot2}` theme (like my `theme_steve()`) in `{stevethemes}`,
 #' but this will do for this purpose.
 #' 
 gss_spending %>%
-   group_by(race) %>%
-   count() %>%
-   ggplot(., aes(as.factor(race), n)) + 
+   count(race) %>%
+   ggplot(., aes(as.factor(race), n))  +
    geom_bar(color="black", alpha=0.8, stat="identity") +
-   scale_y_continuous(labels = scales::comma) +
+   scale_y_continuous(labels = scales::comma_format(big.mark = " ")) +
    scale_x_discrete(labels = c("White","Black","Other")) +
    geom_text(aes(label=n), vjust=-.5, colour="black",
              position=position_dodge(.9), size=4) +
@@ -173,9 +181,7 @@ median(gss_spending$degree, na.rm=T)
 #' 50% is the row that contains the median.
 #' 
 gss_spending %>%
-  group_by(degree) %>%
-  count() %>%
-  ungroup() %>%
+  count(degree) %>%
   mutate(degree_lab = c("Did Not Graduate HS", "High School", "Junior College", 
                         "Bachelor Degree", "Graduate Degree"),
          prop = n/sum(n),
@@ -195,35 +201,35 @@ gss_spending %>%
 #' We can suppress that the same way.
 #' 
 pwt_sample %>%
-  group_by(year) %>%
   summarize(mean_rgdpna = mean(rgdpna, na.rm=T),
-            sd_rdgpna = sd(rgdpna, na.rm=T))
+            sd_rdgpna = sd(rgdpna, na.rm=T),
+            .by = year)
 
 #' Remember to always look at your data before saying anything with confidence about them, but
 #' a standard deviation that is larger than a mean is usually a good indicator of a large, large
 #' spread in the data. Since we're dealing with GDP data you'll have the GDPs of the United
 #' States juxtaposed to Greece and Iceland, at least in this sample.
 #' 
-#' You can also graph this if you wanted to see mean real GDP over time for these 21 countries.
+#' You can also graph this if you wanted to see mean real GDP over time for these 22 countries.
 # 
 pwt_sample %>%
-  group_by(year) %>%
-  summarize(meanrgdp = mean(rgdpna, na.rm=T)) %>% 
-  ungroup() %>% # practice safe group_by()
+  summarize(meanrgdp = mean(rgdpna, na.rm=T),
+            .by = year) %>% 
   mutate(meanrgdpb = meanrgdp/1000) %>%
-  ggplot(.,aes(year, meanrgdpb)) + geom_line() +
+  ggplot(.,aes(year, meanrgdpb)) + 
+  geom_line() +
   scale_x_continuous(breaks = seq(1950, 2020, by = 5)) +
-  scale_y_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::dollar_format()) +
   labs(x = "",
        y = "Average Real GDP (in Constant 2017 National Prices, in Billion 2017 USD)",
        caption = "Data: Penn World Table (v. 10.0) via ?pwt_sample in {stevedata}",
-       title = "Average Real GDP for 21 Rich Countries, 1950-2019",
+       title = "Average Real GDP for 22 Rich Countries, 1950-2019",
        subtitle = "The average real GDP in 2017 was over 2.3 trillion dollars, which should seem super sketchy.")
 
 #' Nothing looks terribly amiss in that line chart, per se. You see a little recession effect. You see the 
 #' "lostness" of the 1970s, at least a little. However, something is. Did you notice that the average real
-#' GDP for these 21 countries in 2019 was over 2 trillion dollars? Something seems fishy about that, 
-#' because it is. These data are 21 select rich countries, but  the United States has an enormous 
+#' GDP for these 22 countries in 2019 was over 2 trillion dollars? Something seems fishy about that, 
+#' because it is. These data are 22 select rich countries, but  the United States has an enormous 
 #' GDP among even those select rich countries. I use these data to underscore a basic problem with
 #' the arithmetic mean for continuous variables: it is *very sensitive* to skew (here: right skew). 
 #' The U.S. is a clear anomaly among these select rich countries. Indeed, it looks like the U.S. 
@@ -249,8 +255,8 @@ pwt_sample %>%
   geom_vline(aes(xintercept = median(rgdpb, na.rm = T)), linetype="dashed") +
   geom_vline(aes(xintercept = mean(rgdpb, na.rm = T))) +
   scale_x_continuous(breaks = seq(0, 20000,by=2000),
-                     labels = scales::comma) +
-  labs(title = "A Density Plot of Real GDP in 2019 for 21 Rich Countries",
+                     labels = scales::dollar_format()) +
+  labs(title = "A Density Plot of Real GDP in 2019 for 22 Rich Countries",
        x = "Real GDP in Billions 2017 USD",
        y = "",
        caption = "Data: Penn World Table (v. 10) via ?pwt_sample in {stevedata}.\nMedian noted in the dashed line while the mean is noted in the solid line.",
@@ -261,21 +267,19 @@ pwt_sample %>%
 #' implies a skew problem that is getting worse over time.
 #' 
 pwt_sample %>%
-  group_by(year) %>%
   mutate(rgdpb = rgdpna/1000) %>%
   summarize(Median = median(rgdpb, na.rm=T),
-            Mean = mean(rgdpb, na.rm=T)) %>%
-  group_by(year) %>%
-  gather(Category, value, Median:Mean) %>%
+            Mean = mean(rgdpb, na.rm=T),
+            .by = year) %>%
+  gather(Category, value, Median:Mean, -year) %>%
   ggplot(.,aes(year,value, color=Category, linetype=Category)) +
-  geom_line(size=1.1) +
+  geom_line(linewidth=1.1) +
   scale_x_continuous(breaks = seq(1950, 2020, by =5)) +
   scale_y_continuous(labels = scales::comma) +
-  theme(legend.position = "bottom") +
-  labs(x = "",
+  theme(legend.position = "bottom") + labs(x = "",
        y = "Median and Mean Real GDP (in Constant Billion 2017 USD)",
        caption = "Data: Penn World Table (v. 10) via ?pwt_sample in {stevedata}",
-       title = "Median and Mean Real GDP for 21 Rich Countries, 1950-2019",
+       title = "Median and Mean Real GDP for 22 Rich Countries, 1950-2019",
        subtitle = "A mean that further separates from the mean suggests a worsening skew problem.")
 
 #' # An Aside: On "Dummy" Variables
@@ -296,7 +300,7 @@ pwt_sample %>%
 #' 1/2. Always recode those.
 #' 
 #' Let's see what this looks like with the `sex` variable in `gss_spending`. 
-#' `sex` is a numeric vetor for the respondent's sex, either female (1) or male (0).
+#' `sex` is a numeric vector for the respondent's sex, either female (1) or male (0).
 #' 
 gss_spending %>%
   # where sex = 1 for women, 0 for men
@@ -361,7 +365,7 @@ gss_spending %>%
 #' to this variable to summarize it with a mean.
 #' 
 gss_spending %>%
-  ggplot(.,aes(sumnat)) + 
+  ggplot(.,aes(sumnat)) +
   geom_bar(alpha=0.8, fill="#619cff",color="black") +
   labs(title = "A Histogram of Attitudes Toward Government Spending",
        subtitle = "There is some left skew, but the data still look normal.",
@@ -386,14 +390,13 @@ wvs_justifbribe %>%
 #' distinct values. A graph will bring the problem in full light.
 
 wvs_justifbribe %>%
-  group_by(f117) %>%
-  count() %>%
-  na.omit %>%
+  count(f117) %>%
+  na.omit %>% # count() will also summarize the NAs, which we don't want.
   ggplot(.,aes(as.factor(f117), n)) +
   geom_bar(stat="identity", alpha=0.8, color="black") +
   scale_x_discrete(labels=c("Never Justifiable", "2", "3", "4",
                             "5", "6", "7", "8", "9", "Always Justifiable")) +
-  scale_y_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma_format(big.mark = " ")) +
   geom_text(aes(label=n), vjust=-.5, colour="black",
             position=position_dodge(.9), size=4) +
   labs(y = "Number of Observations in Particular Response",
@@ -416,6 +419,10 @@ wvs_justifbribe %>%
 #' 
 wvs_justifbribe
 
+wvs_justifbribe %>%
+  mutate(never_justifiable = ifelse(f117 == 1, 1, 0),
+         somewhat_justifiable = ifelse(f117 == 1, 0, 1))
+
 #' You want to use the `mutate()` function to create a dummy variable whereby if `f117` is 1, it's 0. If it's 
 #' greater than 1, code it as 1. Let's use the `mutate()` wrapper to create a new `bribe_dummy` variable
 #' that has this information. Pay careful attention to what the `case_when()` function is doing in 
@@ -427,9 +434,8 @@ wvs_justifbribe %>%
     # if f117 == 1, it's 0
     f117 == 1 ~ 0,
     # if it's f117 > 1 (or %in% c(2:10)), it's 1
-    f117 > 1 ~ 1,
+    f117 > 1  ~ 1,
     # if it's anything else (here: NA), keep it as NA.
-    # This is equivalent to also doing TRUE ~ f117
     TRUE ~ NA_real_
   )) -> Data # Create a new data object for now.
 
@@ -444,6 +450,7 @@ Data %>%
 #' that they're people that are withholding what they think about taking a bribe and we want to perhaps understand 
 #' that as a kind of dependent variable? Here's how we'd do that.
 # Taking our data frame, and...
+
 Data %>%
   # ...using mutate() to create a new column in the data where,
   # using case_when()
