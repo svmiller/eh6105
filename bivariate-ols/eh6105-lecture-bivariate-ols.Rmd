@@ -52,6 +52,13 @@ options(knitr.kable.NA = '')
 library(tidyverse)
 library(stevemisc)
 library(stevedata)
+library(stevethemes)
+
+eurostat_codes %>% pull(iso2c) -> isocodes_we_want
+
+wbd_example %>% na.omit %>%
+  filter(year == 2020)  %>% 
+  filter(iso2c %in% isocodes_we_want) -> Data
 
 options("modelsummary_format_numeric_latex" = "plain")
 options(knitr.kable.NA = '')
@@ -93,16 +100,21 @@ We'll go over the following two topics.
 ```r
 library(tidyverse) # for all things workflow
 library(stevemisc) # for various formatting things
-library(stevedata) # for my toy data, including election_turnout
+library(stevedata) # for my toy data, including the data we'll be using
+library(stevethemes)
 ```
 
 # Correlation
 ### Correlation
 
-*Question*: does a state's voter turnout vary by the state's level of education?
+*Question*: does a country's life expectancy vary by its human capital?
 
-- Education: % of state with high school diploma. (CPS estimates for 2015)
-- Turnout: voter turnout for highest office (i.e. president) in 2016 general election.
+<!-- - Education: % of state with high school diploma. (CPS estimates for 2015) -->
+<!-- - Turnout: voter turnout for highest office (i.e. president) in 2016 general election. -->
+
+- Human capital (index): how well today can citizen expect to achieve full health and achieve her formal education potential. [0:1]
+- Life expectancy: average life expectancy form men and women (in years)
+- *Data subset to 2020 for states with Eurostat codes.*
 
 We get a preliminary judgment using a **scatterplot**.
 
@@ -147,15 +159,16 @@ We get a preliminary judgment using a **scatterplot**.
 
 ```{r scatter1, echo=F, eval=T, warning=F}
 
-ggplot(election_turnout, aes(perhsed, turnoutho)) + 
-  geom_point(size=I(2)) + theme_steve_web() +
-  xlim(80,95) +
-  scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
-  labs(title = "A Scatterplot of State-Level Education and Voter Turnout in the 2016 General Election",
-       subtitle = "The data are scattered in a formal consistent/positive way. Hawaii was always going to be a clear outlier.",
-       x = "Percentage of Residents 25-years-and-older with at Least a High School Diploma",
-       y = "Percentage Turnout of VEP for Highest Office",
-       caption = "Data: ?election_turnout in {stevedata}.")
+ggplot(Data, aes(hci, lifeexp)) + 
+  geom_point(size=I(2)) + 
+  theme_steve() +
+  #xlim(80,95) +
+  #scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
+  labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
+       subtitle = "The data are scattered in a formal consistent/positive way.",
+       x = "Human Capital Index",
+       y = "Life Expectancy in Years for Me and Women",
+       caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
 
 ```
 
@@ -191,22 +204,22 @@ $$
 
 ```{r scatterz, echo=F, eval=T, warning=F, error=F, message=F}
 library(ggrepel)
-election_turnout %>%
-  mutate(z_perhsed = (perhsed - mean(perhsed))/sd(perhsed),
-         z_turnoutho = (turnoutho - mean(turnoutho))/sd(turnoutho)) %>%
-  ggplot(.,aes(z_perhsed, z_turnoutho)) +
-  geom_point(size=I(2)) + theme_steve_web() +
+Data %>%
+  r1sd_at(c("lifeexp", "hci")) %>%
+  ggplot(.,aes(s_hci, s_lifeexp)) +
+  geom_point(size=I(2)) + 
+  theme_steve() +
   # xlim(-2.2,2) + ylim(-3.3,3.3) +
   geom_vline(xintercept=0, linetype="dashed") +
   geom_hline(yintercept=0, linetype="dashed") +
   scale_y_continuous(breaks = c(-3,-2,-1,0,1,2,3), limits=c(-3.1,3)) +
-  geom_label_repel(aes(label=ifelse(z_perhsed > 0 & z_turnoutho < 0 ,as.character(state),'')), family="Open Sans") +
-  geom_label_repel(aes(label=ifelse(z_perhsed < 0 & z_turnoutho > 0 ,as.character(state),'')), family="Open Sans") +
-  labs(title = "A Scatterplot of State-Level Education and Voter Turnout in the 2016 General Election",
-       subtitle = "Observations in the negative correlation quadrants are highlighted for emphasis.",
-       x = "Percentage of Residents 25-years-and-older with at Least a High School Diploma (Standardized)",
-       y = "Percentage Turnout of VEP for Highest Office (Standardized)",
-       caption = "Data: ?election_turnout in {stevedata}.")
+  geom_label_repel(aes(label=ifelse(s_hci > 0 & s_lifeexp < 0 ,as.character(country),'')), family="Open Sans") +
+  geom_label_repel(aes(label=ifelse(s_hci < 0 & s_lifeexp > 0 ,as.character(country),'')), family="Open Sans") +
+    labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
+        subtitle = "Observations in the negative correlation quadrants are highlighted for emphasis.",
+       x = "Human Capital Index  (Standardized)",
+       y = "Life Expectancy in Years for Me and Women (Standardized)",
+       caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
 
 ```
 
@@ -217,7 +230,7 @@ election_turnout %>%
 - Cases in lower-left quadrant are below the mean in both *x* and *y*.
 - Upper-left and lower-right quadrants are negative-correlation quadrants.
 
-All told, our Pearson's *r* is 26.41369/50, or .52.
+All told, our Pearson's *r* is 35.00805/47, or about .74
 
 - We would informally call this a fairly strong positive relationship.
 
@@ -226,26 +239,17 @@ All told, our Pearson's *r* is 26.41369/50, or .52.
 \scriptsize
 ```{r orinr}
 
-election_turnout %>%
-  mutate(z_perhsed = (perhsed - mean(perhsed))/sd(perhsed),
-         z_turnoutho = (turnoutho - mean(turnoutho))/sd(turnoutho)) -> election_turnout
+Data %>%
+  r1sd_at(c("lifeexp", "hci")) -> Data
 
-with(election_turnout, sum(z_perhsed*z_turnoutho)/(length(state)-1))
+with(Data, sum(s_lifeexp*s_hci)/(length(country)-1))
 
-election_turnout %>%
-  summarize(cor = cor(perhsed, turnoutho)) %>%
+Data %>%
+  summarize(cor = cor(hci,lifeexp)) %>%
   pull()
 
 ```
 \normalsize
-
-### If You're Curious about the Hawaii Outlier...
-
-```{r hawaii}
-election_turnout %>%
-  filter(state != "Hawaii") %>%
-  summarize(cor = cor(perhsed, turnoutho))
-```
 
 # Linear Regression
 ## Demystifying Regression
@@ -408,15 +412,27 @@ The next figure offers a representation of this for our state education and turn
 
 ```{r scatterline, echo=F, eval=T, warning=F}
 
-ggplot(election_turnout, aes(perhsed, turnoutho)) + 
-  geom_point(size=I(2)) + theme_steve_web() +
-  xlim(80,95) +
-  scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
+ggplot(Data, aes(hci, lifeexp)) + 
+  geom_point(size=I(2)) + 
+  theme_steve() +
   geom_smooth(method=lm, se=FALSE) +
-  labs(title = "Education and Turnout in the 2016 General Election",
-       x = "Percentage of Residents 25-years-and-older with at Least a High School Diploma",
-       y = "Percentage Turnout of VEP for Highest Office",
-       subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.")
+  #xlim(80,95) +
+  #scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
+  labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
+       subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.",
+       x = "Human Capital Index",
+       y = "Life Expectancy in Years for Me and Women",
+       caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
+# 
+# ggplot(election_turnout, aes(perhsed, turnoutho)) + 
+#   geom_point(size=I(2)) + theme_steve_web() +
+#   xlim(80,95) +
+#   scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
+#   geom_smooth(method=lm, se=FALSE) +
+#   labs(title = "Education and Turnout in the 2016 General Election",
+#        x = "Percentage of Residents 25-years-and-older with at Least a High School Diploma",
+#        y = "Percentage Turnout of VEP for Highest Office",
+#        subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.")
 
 ```
 
@@ -425,7 +441,7 @@ ggplot(election_turnout, aes(perhsed, turnoutho)) +
 \scriptsize
 
 ```{r basiclm}
-summary(M1 <- lm(turnoutho ~ perhsed, data=election_turnout))
+summary(M1 <- lm(lifeexp ~ hci, data=Data))
 ```
 
 \normalsize
@@ -461,11 +477,11 @@ This has a convoluted estimation procedure.
 It's standard output in a regression formula object in R, though.
 
 
-### If You're Curious...
+<!-- ### If You're Curious... -->
 
-\scriptsize
+<!-- \scriptsize -->
 
-```{r extractses}
+```{r extractses, echo=FALSE, eval=F}
 X <- model.matrix(M1) # Intercept + perhsed
 
 # Residual sum of squares
@@ -481,15 +497,27 @@ sqrt(diag(solve(crossprod(X))) * sigma2)
 
 ```{r scatterlinese, echo=F, eval=T, warning=F}
 
-ggplot(election_turnout, aes(perhsed, turnoutho)) + 
-  geom_point(size=I(2)) + theme_steve_web() +
-  xlim(80,95) +
-  scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
+ggplot(Data, aes(hci, lifeexp)) + 
+  geom_point(size=I(2)) + 
+  theme_steve() +
   geom_smooth(method=lm, se=TRUE) +
-    labs(title = "Education and Turnout in the 2016 General Election",
-       x = "Percentage of Residents 25-years-and-older with at Least a High School Diploma",
-       y = "Percentage Turnout of VEP for Highest Office",
-       subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.")
+  #xlim(80,95) +
+  #scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
+  labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
+       subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.",
+       x = "Human Capital Index",
+       y = "Life Expectancy in Years for Me and Women",
+       caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
+
+# ggplot(election_turnout, aes(perhsed, turnoutho)) + 
+#   geom_point(size=I(2)) + theme_steve() +
+#   xlim(80,95) +
+#   scale_y_continuous(breaks = c(40,45,50,55,60,65,70,75), limits=c(40,75)) +
+#   geom_smooth(method=lm, se=TRUE) +
+#     labs(title = "Education and Turnout in the 2016 General Election",
+#        x = "Percentage of Residents 25-years-and-older with at Least a High School Diploma",
+#        y = "Percentage Turnout of VEP for Highest Office",
+#        subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.")
 
 ```
 
@@ -498,26 +526,30 @@ ggplot(election_turnout, aes(perhsed, turnoutho)) +
 This would be our regression line:
 
 $$
-\hat{y} = -32.30 + 1.05(x)
+\hat{y} = 53.921 + 34.895(x)
 $$
 
 How to interpret this:
 
-- The state in which no one graduated from high school would have a voter turnout of -32.30%.
-	- This is obvious nonsense, which is why you'll want to learn about variable transformations as you progress.
-- Each unit increase in the percentage of the state's citizens having a high school diploma corresponds with an estimated 1.05% increase in voter turnout.
+- The country for which human capital is 0 would have an average life expectancy of 53.921.
+    - This would never be observed, but it's at least a plausible quantity.
+- A one-unit increase in human capital corresponds with an estimate increase in life expectancy of 34.895 years.
+    - Given this variable's scale, this is incidentally a min-max effect.
+
+<!-- - The state in which no one graduated from high school would have a voter turnout of -32.30%. -->
+<!-- 	- This is obvious nonsense, which is why you'll want to learn about variable transformations as you progress. -->
 
 ## Inference in Regression
 ### Inference in Regression
 
-What do we say about that *b*-hat ($\hat{b}$ = 1.05?)
+What do we say about that *b*-hat ($\hat{b}$ = 34.895?)
 
 - If we took another "sample", would we observe something drastically different?
 - How would we know?
 
 ### Inference in Regression
 
-You've done this before. Remember our last lectures? And Z scores?
+You've done this before. Remember our last lectures? And z-scores?
 
 $$
 Z = \frac{\overline{x} - \mu}{s.e.}
@@ -554,12 +586,12 @@ $$
 In our state education and turnout example, this turns out nicely.
 
 $$
-t = \frac{1.05}{.24} = 4.35
+t = \frac{34.895}{4.609} = 7.571
 $$
 
 Our regression coefficient is more than four standard errors from zero .
 
-- The probability of observing it if $\beta$ were really zero is .000067.
+- The probability of observing it if $\beta$ were really zero is 0.00000000128.
 
 We judge our regression coefficient to be "statistically significant."
 
@@ -583,7 +615,7 @@ pull(info_we_want[1,2])/
 
 t_stat
 # two-tail test time
-2*pt(t_stat, 49, lower.tail=FALSE) # hi mom!
+2*pt(t_stat, 46, lower.tail=FALSE) # hi mom!
 ```
 
 \normalsize
