@@ -54,7 +54,9 @@ library(stevemisc)
 library(stevedata)
 library(stevethemes)
 
-eurostat_codes %>% pull(iso2c) -> isocodes_we_want
+eurostat_codes %>% 
+  filter(cat == "EU" | iso2c == "UK") %>% 
+  pull(iso2c) -> isocodes_we_want
 
 wbd_example %>% na.omit %>%
   filter(year == 2020)  %>% 
@@ -95,14 +97,6 @@ We'll go over the following two topics.
 1. **Correlation analysis**
 2. **Regression analysis**
 
-### R Packages We'll Be Using
-
-```r
-library(tidyverse) # for all things workflow
-library(stevemisc) # for various formatting things
-library(stevedata) # for my toy data, including the data we'll be using
-library(stevethemes)
-```
 
 # Correlation
 ### Correlation
@@ -114,7 +108,7 @@ library(stevethemes)
 
 - Human capital (index): how well today can citizen expect to achieve full health and achieve her formal education potential. [0:1]
 - Life expectancy: average life expectancy form men and women (in years)
-- *Data subset to 2020 for states with Eurostat codes.*
+- *Data subset to 2020 for states in the EU (incl. the UK)*
 
 We get a preliminary judgment using a **scatterplot**.
 
@@ -167,7 +161,7 @@ ggplot(Data, aes(hci, lifeexp)) +
   labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
        subtitle = "The data are scattered in a formal consistent/positive way.",
        x = "Human Capital Index",
-       y = "Life Expectancy in Years for Me and Women",
+       y = "Life Expectancy in Years for Men and Women",
        caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
 
 ```
@@ -218,26 +212,26 @@ Data %>%
     labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
         subtitle = "Observations in the negative correlation quadrants are highlighted for emphasis.",
        x = "Human Capital Index  (Standardized)",
-       y = "Life Expectancy in Years for Me and Women (Standardized)",
+       y = "Life Expectancy in Years for Men and Women (Standardized)",
        caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
 
 ```
 
 
-### Education and Turnout (Z Scores)
+### Education and Turnout (z-scores)
 
 - Cases in upper-right quadrant are above the mean in both *x* and *y*.
 - Cases in lower-left quadrant are below the mean in both *x* and *y*.
 - Upper-left and lower-right quadrants are negative-correlation quadrants.
 
-All told, our Pearson's *r* is 35.00805/47, or about .74
+All told, our Pearson's *r* is 16.91/24, or about .70
 
 - We would informally call this a fairly strong positive relationship.
 
-### ...or in R
+<!-- ### ...or in R -->
 
-\scriptsize
-```{r orinr}
+<!-- \scriptsize -->
+```{r orinr, echo=F, eval=F}
 
 Data %>%
   r1sd_at(c("lifeexp", "hci")) -> Data
@@ -402,7 +396,7 @@ The regression coefficient that emerges minimizes the sum of squared differences
 
 - Put another way: "ordinary least squares" (OLS) regression.
 
-The next figure offers a representation of this for our state education and turnout example.
+The next figure offers a representation of this for our example.
 
 <!-- ### Regression: Education and Turnout
 
@@ -421,7 +415,7 @@ ggplot(Data, aes(hci, lifeexp)) +
   labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
        subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.",
        x = "Human Capital Index",
-       y = "Life Expectancy in Years for Me and Women",
+       y = "Life Expectancy in Years for Men and Women",
        caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
 # 
 # ggplot(election_turnout, aes(perhsed, turnoutho)) + 
@@ -506,7 +500,7 @@ ggplot(Data, aes(hci, lifeexp)) +
   labs(title = "A Scatterplot of Human Capital and Life Expectancy in 2020",
        subtitle = "The line that minimizes the sum of squared prediction errors is drawn through these points.",
        x = "Human Capital Index",
-       y = "Life Expectancy in Years for Me and Women",
+       y = "Life Expectancy in Years for Men and Women",
        caption = "Data: ?wbd_example in {stevedata}, by way of World Bank.")
 
 # ggplot(election_turnout, aes(perhsed, turnoutho)) + 
@@ -526,14 +520,14 @@ ggplot(Data, aes(hci, lifeexp)) +
 This would be our regression line:
 
 $$
-\hat{y} = 53.921 + 34.895(x)
+\hat{y} = 51.102 + 38.941(x)
 $$
 
 How to interpret this:
 
-- The country for which human capital is 0 would have an average life expectancy of 53.921.
+- The country for which human capital is 0 would have an average life expectancy of 51.102.
     - This would never be observed, but it's at least a plausible quantity.
-- A one-unit increase in human capital corresponds with an estimate increase in life expectancy of 34.895 years.
+- A one-unit increase in human capital corresponds with an estimate increase in life expectancy of 38.941 years.
     - Given this variable's scale, this is incidentally a min-max effect.
 
 <!-- - The state in which no one graduated from high school would have a voter turnout of -32.30%. -->
@@ -542,7 +536,7 @@ How to interpret this:
 ## Inference in Regression
 ### Inference in Regression
 
-What do we say about that *b*-hat ($\hat{b}$ = 34.895?)
+What do we say about that *b*-hat ($\hat{b}$ = 38.941?)
 
 - If we took another "sample", would we observe something drastically different?
 - How would we know?
@@ -583,25 +577,25 @@ $$
 
 ### Inference in Regression
 
-In our state education and turnout example, this turns out nicely.
+In our example, this turns out nicely.
 
 $$
-t = \frac{34.895}{4.609} = 7.571
+t = \frac{38.941}{8.177} = 4.762
 $$
 
 Our regression coefficient is more than four standard errors from zero .
 
-- The probability of observing it if $\beta$ were really zero is 0.00000000128.
+- The probability of observing it if $\beta$ were really zero is 0.0000842
 
 We judge our regression coefficient to be "statistically significant."
 
 - This is a fancy (and misleading) way of saying "it's highly unlikely to be 0."
 
-### Alternatively, in R...
+<!-- ### Alternatively, in R... -->
 
-\scriptsize
+<!-- \scriptsize -->
 
-```{r}
+```{r, echo=F, eval=F}
 # lm() in R is doing this for you, but let's do it ourselves...
 # Be mindful there is some rounding for presentation.
 broom::tidy(M1)
