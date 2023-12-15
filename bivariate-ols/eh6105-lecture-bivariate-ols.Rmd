@@ -218,7 +218,7 @@ Data %>%
 ```
 
 
-### Education and Turnout (z-scores)
+### Human Capital and Life Expectancy (z-scores)
 
 - Cases in upper-right quadrant are above the mean in both *x* and *y*.
 - Cases in lower-left quadrant are below the mean in both *x* and *y*.
@@ -515,7 +515,7 @@ ggplot(Data, aes(hci, lifeexp)) +
 
 ```
 
-### Regression: Education and Turnout
+### Regression: Human Capital and Life Expectancy
 
 This would be our regression line:
 
