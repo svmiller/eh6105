@@ -488,6 +488,31 @@ ggplot(som_sample, aes(lptrust)) +
                arrow = arrow(length = unit(0.15, "cm")))
 ```
 
+###
+
+```{r, echo=F}
+predict(M4, newdata=pred_grid, interval = "confidence") %>%
+  bind_cols(pred_grid, .) %>%
+  mutate(interest = ifelse(interest == 0, "No Interest", "Interest")) %>%
+  ggplot(.,aes(as.factor(ideo0), fit,
+               ymin = lwr, ymax=upr,
+               color=as.factor(interest), 
+               group=as.factor(interest),
+               fill=as.factor(interest),
+               linetype = as.factor(interest))) + 
+  geom_ribbon(alpha=.4) +
+  geom_line(linewidth=1.1) +
+  scale_x_discrete(labels = c("Clearly to\nthe Left", "Somewhat to\nthe left", 
+                              "Neither left\nnor right", 
+                              "Somewhat to\nthe right",
+                              "Clearly to\nthe Right")) +
+  theme_steve() +
+  labs(x = "Ideology", y = "Predicted Political Trust",
+       subtitle = "Increasing ideology has a stronger effect on trust among those who are politically interested",
+       title = "Predicted Political Trust, by Political Interest and Ideology",
+       linetype = "", color = "", fill="")
+```
+
 # Conclusion
 ### Conclusion
 
