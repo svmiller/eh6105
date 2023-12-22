@@ -24,10 +24,19 @@
 
 library(tidyverse)
 
+#' For those of you wanting the packages we'll be using today without loading 
+#' all of the {tidyverse}, run this. I won't, but here are the component
+#' packages.
+
+# library(dplyr)    # the workhorse
+# library(magrittr) # for the pipe
+# library(tibble)   # for tibbles
+# library(ggplot2)  # for plots
+
 #' # Creating Fake Data to Learn About OLS
 #' 
-#' The lecture uses actual (toy) data from the United States' 2016 general election to introduce
-#' you to OLS in the bivariate case. Now, I think it might be time for you to get it in the completely
+#' The lecture uses actual (toy) data from the World Bank to introduce you to the
+#' linear model in the bivariate case. Now, I think it might be time for you to get it in the completely
 #' "fabricated" sense. In this lab script, you are going to create data that you will use to learn
 #' more about what OLS regression is and what the `lm()` output in R is telling you.
 #' 
