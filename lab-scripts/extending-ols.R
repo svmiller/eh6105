@@ -19,10 +19,9 @@
 
 #' # R Packages/Data for This Session
 #' 
-#' You should've already installed the R packages for this lab session. `{tidyverse}` will be 
-#' for all things workflow and `{stevedata}` will have the data sets we'll be using today. I should
-#' be transparent that we'll just be walking through how I did the analyses I put into the relevant
-#' lecture. `{stevemisc}` has a function for scaling things by a standard deviation (`r1sd()`).
+#' You should've already installed the R packages for this lab session. 
+#' `{tidyverse}` will be for all things workflow and `{stevedata}` will have the 
+#' data sets we'll be using today.
 
 library(tidyverse)
 library(stevedata)
@@ -36,12 +35,13 @@ library(stevedata)
 
 #' # Building Toward Multiple Regression
 #' 
-#' Last time we had a lab, we just focused on bivariate OLS with fake data that we created.
-#' The goal of that exercise was to show you what OLS looked like when you had maximum
-#' control over the model parameters. We'll use some actual data this time. This
-#' is a survey data set from the United Kingdom in 2018-19, largely probing 
-#' individual attitudes toward immigration. You can find out more about this 
-#' data set by typing `?ESS9GB` into Rstudio. You can also 
+#' Last time we had a lab, we just focused on bivariate linear model with fake 
+#' data that we created. The goal of that exercise was to show you what the
+#' linear model looked like when you had maximum control over the model 
+#' parameters. We'll use some actual data this time. This is a survey data set 
+#' from the United Kingdom in 2018-19, largely probing individual attitudes 
+#' toward immigration. You can find out more about this data set by typing 
+#' `?ESS9GB` into Rstudio. You can also 
 #' [go here](http://svmiller.com/stevedata/reference/election_turnout.html) for
 #' a web version of the codebook.
 
@@ -103,7 +103,7 @@ summary(M1)
 t.test(immigsent ~ northeast, Data)
 
 #' In this simple difference of means, the mean immigration sentiment where
-#' `northeast` is 0 is 17.02. THe mean immigration sentiment where `northeast` 
+#' `northeast` is 0 is 17.02. The mean immigration sentiment where `northeast` 
 #' is 1 is 14.65. The difference between those two numbers is basically the 
 #' regression coefficient. It's the "North East" effect, which basically
 #' decreases immigration sentiment by about 2.37. That effect is highly unlikely 
@@ -286,16 +286,18 @@ summary(M7)
 #' 
 #' I want to use this as an illustrative case. *Be careful* in how you interpret
 #' your interactions, and how you model them. We got lucky here that that the
-#' data have naturally occurring 0s, but what is "0" will influence what exactly
-#' the regression summary tells you. For example, let's center the data so that
-#' 0 is the people in the middle of the scale. Observe:
+#' data have naturally occurring 0s, but what is "0"---and whether there's a 0
+#' at all---will influence what exactly the regression summary tells you. For 
+#' example, let's center the data so that 0 is the people in the middle of the 
+#' scale. Observe:
 #' 
 
 Data %>%
   mutate(c_lrscale = lrscale - 5) -> Data
 
 Data %>%
-  distinct(lrscale, c_lrscale)
+  distinct(lrscale, c_lrscale) %>%
+  arrange(lrscale)
 
 #' Take very quick inventory of what this did. We took the raw data and 
 #' subtracted 5 from it. Now, 0 are people who would place themselves in the
@@ -307,7 +309,7 @@ Data %>%
 #' 
 M8 <- lm(immigsent ~ scotland + female*c_lrscale, Data)
 summary(M8)
- 
+
 #' Compare this to the output of `M7`. Notice how the gender dummy variable isn't
 #' significant? Except, again, you have to be careful because the `female` dummy
 #' is now the difference between men and women for those in the middle, not the
@@ -339,18 +341,35 @@ tibble(lrscale = c(1, 5, 10, 1, 5, 10),
        female = c(0,0,0,1,1,1),
        scotland = 0) -> newdat
 
-newdat
+newdat # Look at our hypothetical data/prediction grid.
 
 Preds <- predict(M7, newdata = newdat, se.fit = TRUE)
 
-Preds %>% as_tibble() %>%
+Preds # Look at our predictions.
+
+Preds %>% as_tibble() %>% # Coerce to a tibble, and...
+  # bind_cols to the prediction grid/hypothetical data, and...
   bind_cols(newdat, .) %>% 
+  # select just what we want, to look at  it...
   select(lrscale:se.fit)
 
+#' Since I can see that performed how I wanted it to. Let's make it pretty.
 
 Preds %>% as_tibble() %>%
   bind_cols(newdat, .) %>% 
   select(lrscale:se.fit) %>%
+  # Okay, there's going to be some hackiness (sic). First, we're going to create
+  # lower and upper bounds that are 90% intervals around +/- the standard error.
+  # Next, we're going to create a categorical variable from the female variable
+  # in a way that's super obvious. Next. We're going to create a categorical
+  # variable from the `lrscale` variable (ideo_lbl) that adds more intuitive 
+  # labels. The \n you see there forces a linebreak for legibility in the label.
+  # You'll see what it does. Using the fct_inorder() forces it to be ordered
+  # because, otherwise, it would display 1, 10, 5 (i.e. furthest, furthest, 
+  # middle) because of the alphabetical order. Because our data are already
+  # ordered, this is just a shortcut/cheat code to do what we want to do. In
+  # this case, it's because I know y'all might help to see the left in red and 
+  # the right in blue.
   mutate(lwr = fit - 1.645*se.fit,
          upr = fit + 1.645*se.fit,
          gndr_lbl = ifelse(female == 0, "Men", "Women"),
