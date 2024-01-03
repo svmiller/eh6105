@@ -327,7 +327,7 @@ summary(M8)
 #' at what you did just to see for yourself.
 #' 
 #' Here's what we'll do. We'll create a simple prediction grid. Let the ideology
-#' variable be either 1 (furthest to the left), 5 (in the middle), or 10 
+#' variable be either 0 (furthest to the left), 5 (in the middle), or 10 
 #' (furthest to the right). Let the `female` variable range from 0 to 1. Then, 
 #' given the model we estimated, we're going to get predictions from the model 
 #' and standard errors around those predictions. Let the Scotland effect be 0
@@ -337,7 +337,7 @@ summary(M8)
 #' Note: it's killing me to not ask you to install `{modelr}` for this, but you
 #' should absolutely install `{modelr}` for this. It makes it way less tedious.
 
-tibble(lrscale = c(1, 5, 10, 1, 5, 10),
+tibble(lrscale = c(0, 5, 10, 0, 5, 10),
        female = c(0,0,0,1,1,1),
        scotland = 0) -> newdat
 
@@ -365,7 +365,7 @@ Preds %>% as_tibble() %>%
   # variable from the `lrscale` variable (ideo_lbl) that adds more intuitive 
   # labels. The \n you see there forces a linebreak for legibility in the label.
   # You'll see what it does. Using the fct_inorder() forces it to be ordered
-  # because, otherwise, it would display 1, 10, 5 (i.e. furthest, furthest, 
+  # because, otherwise, it would display 0, 10, 5 (i.e. furthest, furthest, 
   # middle) because of the alphabetical order. Because our data are already
   # ordered, this is just a shortcut/cheat code to do what we want to do. In
   # this case, it's because I know y'all might help to see the left in red and 
@@ -374,7 +374,7 @@ Preds %>% as_tibble() %>%
          upr = fit + 1.645*se.fit,
          gndr_lbl = ifelse(female == 0, "Men", "Women"),
          ideo_lbl = case_when(
-           lrscale == 1 ~ "Furthest\nLeft",
+           lrscale == 0 ~ "Furthest\nLeft",
            lrscale == 5 ~ "Middle",
            lrscale == 10 ~ "Furthest\nRight"
          ),
@@ -389,12 +389,12 @@ Preds %>% as_tibble() %>%
 
 #' What this tells me: the effect of increasing ideology on pro-immigration 
 #' sentiment is stronger for the men than it is the women. For women furthest
-#' to the left, their mean pro-immigration sentiment is 18.8. Furthest to the 
-#' right: 14.3. That's a min-max difference of 4.5 points. For the men: the 
+#' to the left, their mean pro-immigration sentiment is 19.3. Furthest to the 
+#' right: 14.3. That's a min-max difference of about 5 points. For the men: the 
 #' estimated pro-immigration sentiment for non-Scottish dudes furthest to the 
-#' left is 20.4, which is interestingly higher than the women furthest to the
+#' left is 21.2, which is interestingly higher than the women furthest to the
 #' left. However, the estimated pro-immigration sentiment for the men furthest
-#' to the right is 13.2. That's a min-max difference of 7.2 points. Kinda cool,
+#' to the right is 13.2. That's a min-max difference of 8 points. Kinda cool,
 #' and kinda interesting as I'm doing this on the fly for the sake of this class.
 #' 
 #' There, is I suppose, an alternate interpretation that is largely consistent
