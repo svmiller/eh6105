@@ -42,7 +42,7 @@ library(stevedata)
 #' from the United Kingdom in 2018-19, largely probing individual attitudes 
 #' toward immigration. You can find out more about this data set by typing 
 #' `?ESS9GB` into Rstudio. You can also 
-#' [go here](http://svmiller.com/stevedata/reference/election_turnout.html) for
+#' [go here](http://svmiller.com/stevedata/reference/ESS9GB.html) for
 #' a web version of the codebook.
 
 ESS9GB
