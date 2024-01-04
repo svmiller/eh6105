@@ -33,10 +33,13 @@ options(warn = -1)
 library(tidyverse)
 library(stevedata)
 library(stevemisc)
+library(stevethemes) # optional, but I want it...
 library(lmtest)
 library(modelsummary)
 library(fixest)
 library(modelr)
+
+theme_set(theme_steve()) # optional, but I want it...
 
 #' # The Data We'll Be Using
 #' 
@@ -61,6 +64,7 @@ library(modelr)
 #' ideology on an 11-point left-right scale (`lrscale`). Higher values of
 #' `immigsent` indicates greater positive orientation or receptiveness to 
 #' immigrants/immigration.
+
 M1 <- lm(immigsent ~ agea + female + eduyrs + uempla + hinctnta + lrscale, 
          ESS9GB, na.action = na.exclude)
 
@@ -78,6 +82,7 @@ M1 <- lm(immigsent ~ agea + female + eduyrs + uempla + hinctnta + lrscale,
 #' for skepticism about these arguments in the American context and see this
 #' [blog post](http://svmiller.com/blog/2021/02/thinking-about-your-priors-bayesian-analysis/)
 #' that riffs on the unemployment effect as a weak data problem.
+
 summary(M1)
 
 #' Now, let's do some diagnostic testing.
@@ -114,7 +119,6 @@ plot(M1, which=1)
 ESS9GB %>%
   ggplot(.,aes(.fitted, .resid)) +
   geom_point(pch = 21) +
-  theme_steve() +
   geom_hline(yintercept = 0, linetype="dashed", color="red") +
   geom_smooth(method = "loess")
 
@@ -126,30 +130,51 @@ ESS9GB %>%
 #' where exactly the issue might be. That's why I wrote the `linloess_plot()` in
 #' `{stevemisc}`. This plot takes a model object and, for each right-hand
 #' side variable, draws a rise-over-run line of best fit and the LOESS smoother.
-#' Do note this tells you nothing about binary IVs, but binary IVs aren't the problem
-#' here.
-linloess_plot(M1, pch=21) +
-  theme_steve()
+#' Do note this tells you nothing about binary IVs, but binary IVs aren't the 
+#' problem here.
 
-#' The thing I like about this plot is that it can point to multiple problems, though it
-#' won't point you in the direction of any potential interactions. No matter, here it shows
-#' any proxy for the education-level of the respondent in a developed European country
-#' like the United Kingdom is going to have two sources of weirdness. For one, very
-#' few respondents will have so few years of education indicating they are something
-#' like a primary school dropout. They exist, and they can be anyone in the native-born
-#' UK population for all I know, but they're rare. Second, you'll have some career students
-#' (överliggare, I believe you Swedes call them). They also exist, but they're rare. Maybe
-#' you want to implement some kind of right-censoring. Let's say, above 25, we're just going
-#' to keep them as 25s.
+linloess_plot(M1, pch=21)
+
+#' {car} has this one for you, if you'd like. I'll concede it works better than
+#' my function at the moment.
+
+car::residualPlots(M1)
+
+#' The thing I like about this plot is that it can point to multiple problems, 
+#' though it won't point you in the direction of any potential interactions. No 
+#' matter, here it shows any proxy for the education-level of the respondent in 
+#' a developed European country like the United Kingdom is going to have two 
+#' sources of weirdness. For one, very few respondents will have so few years 
+#' of education indicating they are something like a primary school dropout. 
+#' They exist, and they can be anyone in the native-born UK population for all 
+#' I know, but they're rare. Second, you'll have some career students 
+#' (överliggare, I believe you Swedes call them). They also exist, but they're 
+#' rare. Maybe you want to implement some kind of left- and right-truncation. 
+#' Wonder what that might be here.
+#' 
+
+ESS9GB %>% count(eduyrs) %>% na.omit %>%
+  ggplot(.,aes(as.factor(eduyrs), n)) + geom_bar(stat='identity')
+
+#' Hmm. How about this: below 10: 10. Above 20: 20. We'll truncate the data
+#' on the left and right end.
 
 ESS9GB %>%
-  mutate(eduyrsrc = ifelse(eduyrs >= 25, 25, eduyrs)) -> ESS9GB
-#' 
-#' There's also some interesting patterns about ideology too. It looks like those heap
-#' in the middle of this (11-point) scale of ideology are behaving differently than those
-#' who lean left or those who lean right. That might imply that the ideology variable
-#' might be better recoded as a categorical variable. In other words, something like this.
-#' 
+  mutate(eduyrsrc = case_when(
+    # if it's 10 or below: 10
+    eduyrs <= 10 ~ 10,
+    # if it's 20 or above: 20
+    eduyrs >= 20 ~ 20,
+    # if it's anything else (i.e. in those bounds): keep it as is.
+    TRUE ~ eduyrs
+  )) -> ESS9GB
+
+#' There's also some interesting patterns about ideology too. It looks like 
+#' those heap in the middle of this (11-point) scale of ideology are behaving 
+#' differently than those who lean left or those who lean right. That might 
+#' imply that the ideology variable might be better recoded as a categorical 
+#' variable. In other words, something like this.
+
 ESS9GB %>% 
   mutate(ideocat = case_when(
     lrscale < 5 ~ "Left",
@@ -158,89 +183,91 @@ ESS9GB %>%
   )) %>%
   mutate(ideocat = fct_relevel(ideocat, "Center")) -> ESS9GB
 
-#' The solutions here are largely up to you. Let's re-estimate the model with the following
-#' changes. We'll square the new `eduyrsrc` variable and introduce the ideology variable
-#' as a fixed effect (in lieu of the `lrscale` variable). Let's see what that does.
+
+#' The solutions here are largely up to you. Let's re-estimate the model with 
+#' the following changes. We'll include our truncated education variable, square 
+#' the age variable, and introduce the ideology variable as a fixed effect (in 
+#' lieu of the `lrscale` variable). Let's see what that does.
 #' 
-M2 <- lm(immigsent ~ agea + female + eduyrsrc + I(eduyrsrc ^2) + 
+M2 <- lm(immigsent ~ agea + I(agea^2) + female + eduyrsrc + 
            uempla + hinctnta + ideocat, 
          ESS9GB, na.action = na.exclude)
 summary(M2)
 
-#' From this changed model, we don't see a discernible difference between the right
-#' and center, nor do we see strong evidence of a curvilinear education effect. The
-#' fitted-residual plot still isn't happy.
-#' 
-plot(M2, which=1)
+#' From this changed model, we don't see a discernible difference between the 
+#' right and center, but we do see evidence of a curvilinear age effect.
 
-#' How else you choose to fix this is up to you, but these diagnostics at least point
-#' to the problem and the discussion here at least suggests some potential fixes. Just
-#' be mindful that any polynomial effects you include in a model have to be justified
-#' by you, the one doing the higher-order polynomials. Always be prepared to explain
-#' anything you're doing.
+#' How else you choose to deal with this is up to you, but these diagnostics at 
+#' least point to the problem and the discussion here at least suggests some 
+#' potential fixes. Just be mindful that any polynomial effects you include in a 
+#' model have to be justified by you, the one doing the higher-order polynomials. 
+#' Always be prepared to explain anything you're doing.
 #' 
 #' # Independence 
 #' 
 #' The OLS model assumes the independence of the model's errors and that any pair
-#' of errors are going to be uncorrelated with each other. Past observations (and past
-#' errors) should not inform other pairs of errors. In formal terms, this assumption 
-#' seems kind of Greek to students. In practice, think of it this way. A lot of the
-#'  theoretical intuition behind OLS is assuming something akin to a simple random 
-#'  sample of the population. You learned central limit theorem by this 
-#'  point and how you can simulate that. However, you may have a data set that 
-#'  does not look like this.
+#' of errors are going to be uncorrelated with each other. Past observations 
+#' (and past errors) should not inform other pairs of errors. In formal terms, 
+#' this assumption seems kind of Greek to students. In practice, think of it 
+#' this way. A lot of the theoretical intuition behind OLS is assuming something 
+#' akin to a simple random sample of the population. You learned central limit 
+#' theorem by this  point and how you can simulate that. However, you may have a 
+#' data set that does not look like this.
 #'  
-#'  In other words, this assumption is going to be violated like mad in any 
-#'  design that has a time-series, spatial, or multilevel component. For 
-#'  students new to this stuff, you should be able to anticipate ahead of 
-#'  time when your errors are no longer independent of each other.
+#' In other words, this assumption is going to be violated like mad in any 
+#' design that has a time-series, spatial, or multilevel component. For 
+#' students new to this stuff, you should be able to anticipate ahead of 
+#' time when your errors are no longer independent of each other.
 #'  
-#'  The implications of non-independent errors---aka “serial correlation” 
-#'  or “autocorrelation”---are generally more about the variance of the 
-#'  estimator than the estimator itself. That said, there is reason to 
-#'  believe the standard errors are wrong and this can have important 
+#' The implications of non-independent errors---aka “serial correlation” 
+#' or “autocorrelation”---are generally more about the variance of the 
+#' estimator than the estimator itself. That said, there is reason to 
+#' believe the standard errors are wrong and this can have important 
 #'  implications for statistical inference you’d like to do. No matter, this
 #'  is a huge assumption about OLS ans violating it ultimately means OLS
 #'  loses its inferential value. The data are no longer randomly sampled in that
 #'  sense.
 #'  
-#'  Once you know under what conditions that autocorrelation is going to 
-#'  happen, you can probably skip this and go right to assorted tricks that you
-#'  know will work given the nature of your serial correlation. If you have a random
-#'  walk time series, you know those can typically be first-differenced in order
-#'  to strip out the source of autocorrelation If you have some type of "spatial"
-#'  serial autocorrelation (e.g. citizens nested in countries, students nested in schools),
-#'  you can employ some kind of fixed effects or random effects to outright model the
-#'  source of unit heterogeneity. No matter, the "textbook" tests for these are typically
-#'  in the time series case and involve the Durbin-Watson test or the Breusch-Godfrey test.
+#' Once you know under what conditions that autocorrelation is going to happen, 
+#' you can probably skip this and go right to assorted tricks that you know will 
+#' work given the nature of your serial correlation. If you have a random walk 
+#' time series, you know those can typically be first-differenced in order to 
+#' strip out the source of autocorrelation If you have some type of "spatial" 
+#' serial autocorrelation (e.g. citizens nested in countries, students nested 
+#' in schools), you can employ some kind of fixed effects or random effects to 
+#' outright model the source of unit heterogeneity. No matter, the "textbook" 
+#' tests for these are typically in the time series case and involve the 
+#' Durbin-Watson test or the Breusch-Godfrey test.
 #'  
-#'  Of the two, practitioners I’ve read seem to favor the latter over the former. The
-#'  Durbin-Watson test has some pretty strong assumptions and only looks for a order-1
-#'  autocorrelation. No matter, it has some informational value when you get deeper into the
-#'  weeks of time series stuff. Both can be estimated by way of the `{lmtest}` package. Let's
-#'  go back to our first model and apply both.
+#' Of the two, practitioners I’ve read seem to favor the latter over the former. 
+#' The Durbin-Watson test has some pretty strong assumptions and only looks for 
+#' a order-1 autocorrelation. No matter, it has some informational value when 
+#' you get deeper into the weeks of time series stuff. Both can be estimated by 
+#' way of the `{lmtest}` package. Let's go back to our first model and apply both.
 #'  
 dwtest(M1)
 bgtest(M1)
 
-#' The "null" hypothesis of both tests is "no autocorrelation." The alternative hypothesis is
-#' "autocorrelation." When the *p*-value is sufficiently small, it indicates a problem. Here,
-#' they suggest no real problem and no further fix is needed. That is not terribly surprising
-#' in this case, as the data are a random sample from the population and done in a mostly
-#' time-invariant way. If there was a serial/spatial correlation to fix, consider some kind
-#' of region fixed effects in this case. It'd be something like this.
+#' The "null" hypothesis of both tests is "no autocorrelation." The alternative 
+#' hypothesis is "autocorrelation." When the *p*-value is sufficiently small, 
+#' it indicates a problem. Here, they suggest no real problem and no further 
+#' fix is needed. That is not terribly surprising in this case, as the data are
+#' a random sample from the population and done in a mostly time-invariant way. 
+#' If there was a serial/spatial correlation to fix, consider some kind of 
+#' region fixed effects in this case. It'd be something like this.
 #' 
 M3 <- update(M1, ~. + factor(region)) 
 # ^ update M1, keep everything as is, add region fixed effects
 summary(M3)
 
 #' Do note fixed effects in this application have a tendency to "demean" other
-#' things in the model, though they're not telling you much here. Indeed, you didn't have 
-#' much of a problem.
+#' things in the model, though they're not telling you much here. Indeed, you 
+#' didn't have much of a problem.
 #' 
-#' No matter, if you have autocorrelation, you have to tackle it outright or your OLS model
-#' has no inferential value. The exact fix depends on the exact nature of the problem, which
-#' will definitely depend on you knowing your data well and what you're trying to accomplish.
+#' No matter, if you have autocorrelation, you have to tackle it outright or 
+#' your OLS model has no inferential value. The exact fix depends on the exact 
+#' nature of the problem, which will definitely depend on you knowing your data 
+#' well and what you're trying to accomplish.
 #' 
 #' # Normality (of the Errors)
 #' 
@@ -277,31 +304,43 @@ summary(M3)
 shapiro.test(resid(M1))
 ks.test(resid(M1), y=pnorm)
 
-#' When *p*-values are sufficiently small, these tests are saying "I can determine these
-#' weren't generated by some kind of normal distribution." My misgiving with these
-#' particular tests are multiple. One, you can dupe them pretty easily with a related
-#' distribution that looks like it, but is not it (e.g. Student's *t*). Two, they are
-#' deceptively just a test of sample size. The more observations you have, the more sensitive
-#' the test is to any observation in the distribution that looks anomalous. Three, textbooks
-#' typically say to use the K-S test if you have a large enough sample size, but, from my
+#' When *p*-values are sufficiently small, these tests are saying "I can 
+#' determine these weren't generated by some kind of normal distribution." My 
+#' misgiving with these particular tests are multiple. One, you can dupe them 
+#' pretty easily with a related distribution that looks like it, but is not it 
+#' (e.g. Student's *t*). For example, let me cheese the Shapiro test with the
+#' Poisson distribution.
+
+set.seed(8675309)
+shapiro.test(lambdas <- rpois(1000, 100))
+# c.f. http://svmiller.com/blog/2023/12/count-models-poisson-negative-binomial/
+
+#' I should not have passed this test, and yet I did. These aren't normally
+#' distributed. They're Poisson-distributed, and can't be reals.
+
+#' Second, thse normality tests are deceptively just a test of sample size. The 
+#' more observations you have, the more sensitive the test is to any observation 
+#' in the distribution that looks anomalous. Three, textbooks typically say to 
+#' use the K-S test if you have a large enough sample size, but, from my 
 #' experience, that's the test that's most easily duped.
 #' 
-#' Here's what I recommend instead, knowing that the normality assumption of errors is
-#' one of the least important assumptions: visualize this instead. For one, the "textbook"
-#' visual diagnostic is the Q-Q plot. This is actually a default plot in base R for
-#' linear models if you know where to look.
+#' Here's what I recommend instead, knowing that the normality assumption of 
+#' errors is one of the least important assumptions: visualize this instead. For 
+#' one, the "textbook" visual diagnostic is the Q-Q plot. This is actually a 
+#' default plot in base R for linear models if you know where to look.
 #' 
 plot(M1, which=2)
 
 #' The Q-Q plots the theoretical quantiles of the residuals against the standardized
 #' residuals. Ideally, they all fall on a nice line. Here, they don't, suggesting a
-#' problem.
+#' problem. The negative residuals are more negative than expected and the 
+#' positive residuals are more positive than expected.
 #' 
-#' I mentioned in lecture that a better way of gauging just how severe the issue is will
-#' involve generating a density plot of the residuals against a stylized density plot
-#' matching the description of the residuals (i.e. with a mean of 0 and a standard 
-#' deviation equal to the standard deviation of the residuals). It would look something
-#' like this.
+#' I mentioned in lecture that a better way of gauging just how severe the issue 
+#' is will involve generating a density plot of the residuals against a 
+#' stylized density plot matching the description of the residuals (i.e. with a 
+#' mean of 0 and a standard deviation equal to the standard deviation of the 
+#' residuals). It would look something like this.
 #' 
 ESS9GB %>%
   ggplot(.,aes(.resid)) +
@@ -309,38 +348,60 @@ ESS9GB %>%
   stat_function(fun = dnorm, color="blue",
                 args = list(mean = 0, 
                             sd = sd(ESS9GB$.resid, na.rm=T)),
-                linetype="dashed", size=1.1) +
-  theme_steve() 
+                linetype="dashed", size=1.1) 
 
-#' In this plot, the black solid line is a density plot of the actual residuals whereas
-#' the blue, dashed line is a density plot of a normal distribution with a mean of 0
-#' and a standard deviation equal to the standard deviation of the residuals. The real
-#' thing will always be kind of lumpy in some ways when you're using actual data.
-#' Ask yourself how bad it is. I'd argue that the distribution is not ideal though the
-#' normality of the residuals is reasonably well approximated.
+#' Btw, `rd_plot()` in `{stevemisc}` will do this for you. Here's what it's
+#' doing.
+
+rd_plot <- function(mod) {
+  
+  sdr <- sd(resid(mod), na.rm=T)
+  
+  hold_this <- data.frame(x = resid(mod))
+  
+  ggplot(hold_this, aes(x)) +
+    geom_density() +
+    stat_function(fun = dnorm, color="blue",
+                  args = list(mean = 0, sd = sdr),
+                  linetype="dashed", linewidth=1.1)
+  
+}
+
+rd_plot(M1)
+
+#' In this plot, the black solid line is a density plot of the actual residuals 
+#' whereas the blue, dashed line is a density plot of a normal distribution with 
+#' a mean of 0 and a standard deviation equal to the standard deviation of the 
+#' residuals. The real thing will always be kind of lumpy in some ways when 
+#' you're using actual data. Ask yourself how bad it is. I'd argue that the 
+#' distribution is not ideal though the normality of the residuals is reasonably 
+#' approximated.
 #' 
-#' Your solution to this particular "problem" will depend on what exactly you're doing
-#' in the first place. The instances in which these plots look really problematic will
-#' be situations like these. Your model may have relatively few covariates and the 
-#' covariates you do include are dummy variables. If you have *so* few observations in
-#' the model (i.e. I can count the number of observations in the model on one or three hands),
-#'  any distribution of residuals will look crazy. That's *probably* not your case, 
-#' especially as you've thought through the data-generating process for your 
-#' dependent variable. It's more likely the case that you have a discrete dependent
+#' Your solution to this particular "problem" will depend on what exactly you're 
+#' doing in the first place. The instances in which these plots look really 
+#' problematic will be situations like these. Your model may have relatively 
+#' few covariates and the covariates you do include are dummy variables. If you 
+#' have *so* few observations in the model (i.e. I can count the number of 
+#' observations in the model on one or three hands), any distribution of 
+#' residuals will look crazy. That's *probably* not your case,especially as 
+#' you've thought through the data-generating process for your dependent 
+#' variable. It's more likely the case that you have a discrete dependent
 #' variable and you're trying to impose OLS on it. The end result is a subset of
-#' residuals that look kind of wonky at the tails of the distribution. Under those
-#' conditions, it makes more sense to use the right model for the nature of your
-#' dependent variable. If your DV is binary, consider a logistic regression. If you're
-#' trying to model variation in a 5-item Likert measure, consider the ordinal logistic
-#' regression. If you have a proportion with observations appearing at the exact limit
-#' of the proportion, consider some kind of beta regression. Are you trying to model
-#' a "count" variable (i.e. an integer), especially one that has some kind of skew?
-#' Maybe you want a Poisson regression.
+#' residuals that look kind of wonky at the tails of the distribution. Under 
+#' those conditions, it makes more sense to use the right model for the nature 
+#' of your dependent variable. If your DV is binary, consider a logistic 
+#' regression. If you're trying to model variation in a 5-item Likert measure, 
+#' consider the ordinal logistic regression. If you have a proportion with 
+#' observations appearing at the exact limit of the proportion, consider some 
+#' kind of beta regression. Are you trying to model a "count" variable 
+#' (i.e. an integer), especially one that has some kind of skew?
+#' Maybe you want a Poisson regression, or negative binomial.
 #' 
 #' Either way, the solution to the non-normality of the residuals involves outright
-#' modeling the non-normality. The assumption, to be clear, is about the *errors*,
-#' but the "problem" and the "solution" often point to what exactly your dependent
-#' variable looks like and whether OLS is the right model for the job.
+#' modeling the kind of data that presents this kind of non-normality. The 
+#' assumption, to be clear, is about the *errors*, but the "problem" and the 
+#' "solution" often point to what exactly your dependent variable looks like 
+#' and whether OLS is the right model for the job.
 #' 
 #' # Equal Error Variance (Homoskedasticity)
 #' 
@@ -438,7 +499,18 @@ M5 <- update(M1,  ~.,
 # Instead, let's format it into a nice table.
 modelsummary(list("OLS" = M1, 
                   "WLS" = M5),
-             stars = TRUE)
+             stars = TRUE,
+             caption = "A Caption for This Table. Hi Mom!",
+             gof_map = c("nobs", "adj.r.squared"))
+
+#' Btw, `{stevemisc}` can do this for you.
+
+modelsummary(list("OLS" = M1, 
+                  "WLS" = M5,
+                  "Auto WLS" = wls(M1)),
+             stars = TRUE,
+             caption = "A Caption for This Table. Hi Mom!",
+             gof_map = c("nobs", "adj.r.squared"))
 
 #' Re-estimating the model by way of weighted least squares reveals no real
 #' changes. Some parameters moved around a little bit, but everything is
@@ -466,7 +538,9 @@ M6 <- feols(immigsent ~  agea + female + eduyrs + uempla + hinctnta + lrscale,
 modelsummary(list("OLS" = M1, 
                   "WLS" = M5,
                   "HRSE" = M6),
-             stars = TRUE)
+             stars = TRUE,
+             caption = "A Caption for This Table. Hi Mom!",
+             gof_map = c("nobs", "adj.r.squared"))
 
 #' Not much is changing, though it's not lost on me that the standard errors
 #' that are moving the most are the ones we identified as potentially 
@@ -496,7 +570,7 @@ modelsummary(list("OLS" = M1,
 #' I have [a blog post that explains this in greater detail](http://svmiller.com/blog/2020/03/bootstrap-standard-errors-in-r/).
 
 set.seed(8675309)
-# Starting with the original data usied in M1.
+# Starting with the original data used in M1.
 model.frame(M1) %>%
   # draw 1000 bootstrap resamples
   modelr::bootstrap(n = 1000) %>%
@@ -525,7 +599,7 @@ bootM1 %>%
 
 #' It'd be beneficial to have `{modelsummary}` do this for us. Since this really isn't
 #' a `{modelsummary}` class, I'll just have to [point you here](https://vincentarelbundock.github.io/modelsummary/articles/modelsummary.html#bootstrap)
-#'  for some clarification as to what's happening here.
+#' for some clarification as to what's happening here.
 #' 
 
 tidy_custom.boot <- function(x, ...) {
@@ -545,14 +619,16 @@ tidy_custom.boot <- function(x, ...) {
 }
 
 M7 <- M1 # Copy M1 to a new model
-class(M7) = c("boot", "lm") 
+class(M7) = c("lm", "boot") 
 # ^ prepares {modelsummary} to summarize this model through a bootstrap.
 
 modelsummary(list("OLS" = M1, 
                   "WLS" = M5,
                   "HRSE" = M6,
                   "Bootstrap" = M7),
-             stars = TRUE)
+             stars = TRUE,
+             caption = "A Caption for This Table. Hi Mom!",
+             gof_map = c("nobs", "adj.r.squared"))
 
 #' The summary here suggests that while we have heteroskedastic errors, there
 #' does not appear to be any major concern for the standard errors of our estimates.
