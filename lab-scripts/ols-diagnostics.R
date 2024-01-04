@@ -627,7 +627,8 @@ modelsummary(list("OLS" = M1,
                   "HRSE" = M6,
                   "Bootstrap" = M7),
              stars = TRUE,
-             caption = "A Caption for This Table. Hi Mom!",
+             caption = "A Caption for This Table. Hi Mom! Everyone Say 'Hi' to My Mom!",
+             notes = "Seriously say 'hi' to my mom. She's in Ohio with my two cats.",
              gof_map = c("nobs", "adj.r.squared"))
 
 #' The summary here suggests that while we have heteroskedastic errors, there
