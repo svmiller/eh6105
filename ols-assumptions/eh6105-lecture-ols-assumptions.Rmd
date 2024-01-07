@@ -420,10 +420,12 @@ broom::augment(M3) %>%
   theme_steve_web() +
   geom_point() +
   facet_wrap(~model, scales="free", nrow=2) +
+  geom_hline(yintercept = 0, linetype='dashed', color="#cc0000") +
+  geom_smooth(method = "loess") +
   labs(x = "Fitted Values", y = "Residuals",
        title = "The Top Plot is Good; The Bottom Plot is Bad",
        subtitle = "Non-constant error variances (heteroskedasticity) results in a tell-tale 'cone of shame', making error estimates automatically suspect.",
-       caption = "Data: fake data from this lecture. See previous slides.")
+       caption = "Data: fake data from this lecture. See previous slides. Notice the line is largely unaffected.")
 
 ```
 
