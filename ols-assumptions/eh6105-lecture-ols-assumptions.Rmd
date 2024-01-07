@@ -48,6 +48,7 @@ knitr::opts_chunk$set(
 
 library(tidyverse)
 library(stevemisc)
+library(stevethemes)
 library(stevedata)
 library(stargazer)
 library(modelsummary)
@@ -150,9 +151,9 @@ Second scenario: omitting `Z` biases relationship between `X` and `Y` in directi
 
 - Including `Z` fixes this, barring a massive collinearity problem.
 
-Third scenario: this is an instrumental variable problem (which you'll learn about in the advanced class).
+Third scenario: this is an instrumental variable problem (an advanced topic).
 
-- Even these have their own peculiarities.
+- Even these have their own peculiarities (i.e. in the real world, they are a huge leap of faith).
 
 ## Linearity
 ### Linearity
@@ -188,9 +189,6 @@ OLS assumes an outcome *y* is a linear function of some predictors.
 ###
 
 ```{r, echo=F}
-
-
-
 fakeHappiness %>%
   ggplot(.,aes(age, happy)) + geom_point() +
   theme_steve_web() +
@@ -372,18 +370,18 @@ Assume this simple data-generating process to illustrate heteroskedasticity.
 \scriptsize
 
 ```{r}
-# set.seed(8675309)
+set.seed(8675309)
 tibble(
-  x = rnorm(500, 5, 2),
-  e = rnorm(500, 0, 1),
+  x = rnorm(1000, 5, 2),
+  e = rnorm(1000, 0, 1),
   y = 5 + .25*x + e
 ) -> C # for constant
 
 M3 <- lm(y ~ x, C)
 
 tibble(
-  x = rnorm(500, 5, 2),
-  e = rnorm(500, 0, 1 + .25*x), # uh-oh...
+  x = rnorm(1000, 5, 2),
+  e = rnorm(1000, 0, 1 + x), # uh-oh...
   y = 5 + .25*x + e
 ) -> H # for heteroskedasticity
 
@@ -397,7 +395,7 @@ M4 <- lm(y ~ x, H, na.action=na.exclude)
 ###
 
 ```{r, echo=F}
-modelsummary(list("C" = M3, "H"= M4), output="latex",
+modelsummary(list("C" = M3, "H"= M4), #output="latex",
              title = "Comparing Two Models With and Without Constant Error Variance",
              stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
              coef_map = c("x" = "Independent Variable (x)",
@@ -417,7 +415,7 @@ modelsummary(list("C" = M3, "H"= M4), output="latex",
 broom::augment(M3) %>%
   mutate(model = "Constant Error Variance") %>%
   bind_rows(., broom::augment(M4) %>% 
-              mutate(model = "Heteroskedasticity (Non-Constant Error Variance")) %>%
+              mutate(model = "Heteroskedasticity (Non-Constant Error Variance)")) %>%
   ggplot(.,aes(.fitted, .resid)) +
   theme_steve_web() +
   geom_point() +
@@ -466,13 +464,14 @@ M5 <- lm(abs(resid) ~ fitted,
 H$wts <- 1/(fitted(M5)^2) # 4, 5, 6
 
 M6 <- lm(y ~ x, data=H, weights = wts) # 7
-
+# psst, {stevemisc} can do this:
+# wls(M4)
 ```
 
 ###
 
 ```{r, echo=F}
-modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6), output="latex",
+modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6), #output="latex",
              title = "Comparing Two Models With and Without Constant Error Variance (with Robustness Tests)",
              stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE",
              coef_map = c("x" = "Independent Variable (x)",
@@ -500,7 +499,7 @@ M7 <- feols(y ~ x,
 ###
 
 ```{r, echo=F}
-modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6, "H (OtF-SE)" = M7), output="latex",
+modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6, "H (OtF-SE)" = M7), #output="latex",
              title = "Comparing Two Models With and Without Constant Error Variance (with Robustness Tests)",
              stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE|Std.",
              coef_map = c("x" = "Independent Variable (x)",
@@ -514,7 +513,7 @@ modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6, "H (OtF-SE)" = M7), output=
 
 ```
 
-### Approach 3: Bootstrap!
+### Approach 3: Bootstrap! *LFG*
 
 The simple bootstrap is a useful approach to assess what heteroskedasticity might be doing here.
 
@@ -566,11 +565,11 @@ tidy_custom.boot <- function(x, ...) {
 }
 
 M8 <- lm(y ~ x, H)
-class(M8) = c("boot", "lm")
+class(M8) = c("lm", "boot")
 
 set.seed(8675309)
 modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6, "H (OtF-SE)" = M7,
-                  "H (Bootstrap)" = M8), output="latex",
+                  "H (Bootstrap)" = M8), #output="latex",
              title = "Comparing Two Models With and Without Constant Error Variance (with Robustness Tests)",
              stars = TRUE, gof_omit = "IC|F|Log.|R2$|RMSE|Std.",
              coef_map = c("x" = "Independent Variable (x)",
@@ -580,7 +579,8 @@ modelsummary(list("C" = M3, "H"= M4, "H (WLS)" = M6, "H (OtF-SE)" = M7,
                           "regionfWest" = "West",
                           "(Intercept)" = "Intercept"),
              align = "lccccc") %>%
-  row_spec(0, bold = TRUE) %>% kable_styling(font_size = 9) 
+  row_spec(0, bold = TRUE) %>% 
+  kable_styling(font_size = 9) 
 ```
 
 # Conclusion
