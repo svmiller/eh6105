@@ -3684,18 +3684,38 @@ cats.
 </tr>
 </tfoot>
 </table>
+<p>If you had <code>{sandwich}</code> installed and ready to go, you
+could also do it this way. <code>coeftest()</code> uses
+<code>{lmtest}</code>, which you should’ve installed already.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">8675309</span>)</span>
+<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a><span class="fu">coeftest</span>(M1, <span class="at">vcov =</span> sandwich<span class="sc">::</span><span class="fu">vcovBS</span>(M1, <span class="at">R =</span> <span class="dv">1000</span>))</span></code></pre></div>
+<pre><code>## 
+## t test of coefficients:
+## 
+##               Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) 11.6550571  1.1566761 10.0763 &lt; 2.2e-16 ***
+## agea        -0.0018496  0.0099172 -0.1865    0.8521    
+## female      -0.2483372  0.3270907 -0.7592    0.4478    
+## eduyrs       0.4880932  0.0583921  8.3589 &lt; 2.2e-16 ***
+## uempla      -1.1015334  1.3505118 -0.8156    0.4148    
+## hinctnta     0.3375713  0.0647572  5.2129 2.128e-07 ***
+## lrscale     -0.5825911  0.0997979 -5.8377 6.523e-09 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>FYI, <code>{modelsummary}</code> appears to be able to do this as
 well without having to bootstrap it yourself. In this function, notice
 that the “Bootstrap” model is just <code>M1</code>. We are using the
-<code>vcov</code> argument here to bootstrap for us.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">&quot;OLS&quot;</span> <span class="ot">=</span> M1,</span>
-<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a>                  <span class="st">&quot;WLS&quot;</span> <span class="ot">=</span> M5,</span>
-<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>                  <span class="st">&quot;HRSE&quot;</span> <span class="ot">=</span> M6,</span>
-<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a>                  <span class="st">&quot;Bootstrap&quot;</span> <span class="ot">=</span> M1),</span>
-<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a>             <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a>             <span class="at">vcov =</span> <span class="fu">c</span>(<span class="st">&quot;classical&quot;</span>, <span class="st">&quot;classical&quot;</span>, <span class="st">&quot;classical&quot;</span>, <span class="st">&quot;bootstrap&quot;</span>),</span>
-<span id="cb54-7"><a href="#cb54-7" tabindex="-1"></a>             <span class="at">R =</span> <span class="dv">1000</span>,</span>
-<span id="cb54-8"><a href="#cb54-8" tabindex="-1"></a>             <span class="at">gof_map =</span> <span class="fu">c</span>(<span class="st">&quot;nobs&quot;</span>, <span class="st">&quot;adj.r.squared&quot;</span>))</span></code></pre></div>
+<code>vcov</code> argument here to bootstrap for us. This should work
+provided you have <code>{sandwich}</code> installed.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">8675309</span>) <span class="co"># Note: this is optional</span></span>
+<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">&quot;OLS&quot;</span> <span class="ot">=</span> M1,</span>
+<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>                  <span class="st">&quot;WLS&quot;</span> <span class="ot">=</span> M5,</span>
+<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a>                  <span class="st">&quot;HRSE&quot;</span> <span class="ot">=</span> M6,</span>
+<span id="cb56-5"><a href="#cb56-5" tabindex="-1"></a>                  <span class="st">&quot;Bootstrap&quot;</span> <span class="ot">=</span> M1),</span>
+<span id="cb56-6"><a href="#cb56-6" tabindex="-1"></a>             <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb56-7"><a href="#cb56-7" tabindex="-1"></a>             <span class="at">vcov =</span> <span class="fu">c</span>(<span class="st">&quot;classical&quot;</span>, <span class="st">&quot;classical&quot;</span>, <span class="st">&quot;classical&quot;</span>, <span class="st">&quot;bootstrap&quot;</span>),</span>
+<span id="cb56-8"><a href="#cb56-8" tabindex="-1"></a>             <span class="at">R =</span> <span class="dv">1000</span>,</span>
+<span id="cb56-9"><a href="#cb56-9" tabindex="-1"></a>             <span class="at">gof_map =</span> <span class="fu">c</span>(<span class="st">&quot;nobs&quot;</span>, <span class="st">&quot;adj.r.squared&quot;</span>))</span></code></pre></div>
 <table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table">
 <thead>
 <tr>
@@ -3746,7 +3766,7 @@ Bootstrap
 (1.183)
 </td>
 <td style="text-align:center;">
-(1.150)
+(1.157)
 </td>
 </tr>
 <tr>
@@ -3812,7 +3832,7 @@ female
 (0.337)
 </td>
 <td style="text-align:center;">
-(0.325)
+(0.327)
 </td>
 </tr>
 <tr>
@@ -3845,7 +3865,7 @@ eduyrs
 (0.059)
 </td>
 <td style="text-align:center;">
-(0.057)
+(0.058)
 </td>
 </tr>
 <tr>
@@ -3878,7 +3898,7 @@ uempla
 (1.343)
 </td>
 <td style="text-align:center;">
-(1.339)
+(1.351)
 </td>
 </tr>
 <tr>
@@ -3911,7 +3931,7 @@ hinctnta
 (0.064)
 </td>
 <td style="text-align:center;">
-(0.066)
+(0.065)
 </td>
 </tr>
 <tr>
@@ -3944,7 +3964,7 @@ lrscale
 (0.099)
 </td>
 <td style="text-align:center;box-shadow: 0px 1.5px">
-(0.101)
+(0.100)
 </td>
 </tr>
 <tr>

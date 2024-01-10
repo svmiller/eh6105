@@ -631,11 +631,17 @@ modelsummary(list("OLS" = M1,
              notes = "Seriously say 'hi' to my mom. She's in Ohio with my two cats.",
              gof_map = c("nobs", "adj.r.squared"))
 
+#' If you had `{sandwich}` installed and ready to go, you could also do it this 
+#' way. `coeftest()` uses `{lmtest}`, which you should've installed already.
+set.seed(8675309)
+coeftest(M1, vcov = sandwich::vcovBS(M1, R = 1000))
 
 #' FYI, `{modelsummary}` appears to be able to do this as well without having to
 #' bootstrap it yourself. In this function, notice that the "Bootstrap" model
-#' is just `M1`. We are using the `vcov` argument here to bootstrap for us.
-#' 
+#' is just `M1`. We are using the `vcov` argument here to bootstrap for us. This
+#' should work provided you have `{sandwich}` installed.
+
+set.seed(8675309) # Note: this is optional
 modelsummary(list("OLS" = M1,
                   "WLS" = M5,
                   "HRSE" = M6,
