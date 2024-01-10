@@ -35,9 +35,9 @@ library(stevedata)
 library(stevemisc)
 library(stevethemes) # optional, but I want it...
 library(lmtest)
-library(modelsummary)
-library(fixest)
-library(modelr)
+library(modelsummary) # optional, but you'll love it. Install it.
+library(fixest) # optional, but you'll love it and should install it.
+library(modelr) # for bootstrapping, also optional.
 
 theme_set(theme_steve()) # optional, but I want it...
 
@@ -629,6 +629,20 @@ modelsummary(list("OLS" = M1,
              stars = TRUE,
              caption = "A Caption for This Table. Hi Mom! Everyone Say 'Hi' to My Mom!",
              notes = "Seriously say 'hi' to my mom. She's in Ohio with my two cats.",
+             gof_map = c("nobs", "adj.r.squared"))
+
+
+#' FYI, `{modelsummary}` appears to be able to do this as well without having to
+#' bootstrap it yourself. In this function, notice that the "Bootstrap" model
+#' is just `M1`. We are using the `vcov` argument here to bootstrap for us.
+#' 
+modelsummary(list("OLS" = M1,
+                  "WLS" = M5,
+                  "HRSE" = M6,
+                  "Bootstrap" = M1),
+             stars = TRUE,
+             vcov = c("classical", "classical", "classical", "bootstrap"),
+             R = 1000,
              gof_map = c("nobs", "adj.r.squared"))
 
 #' The summary here suggests that while we have heteroskedastic errors, there

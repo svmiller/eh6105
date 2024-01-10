@@ -1991,9 +1991,9 @@ It’ll make model comparisons a lot easier.</p>
 ## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     as.Date, as.Date.numeric</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(modelsummary)</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">library</span>(fixest)</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">library</span>(modelr)</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(modelsummary) <span class="co"># optional, but you&#39;ll love it. Install it.</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">library</span>(fixest) <span class="co"># optional, but you&#39;ll love it and should install it.</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">library</span>(modelr) <span class="co"># for bootstrapping, also optional.</span></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_steve</span>()) <span class="co"># optional, but I want it...</span></span></code></pre></div>
 </div>
@@ -2719,12 +2719,12 @@ lrscale
 </td>
 </tr>
 <tr>
-<td style="text-align:left;box-shadow: 0px 1px">
+<td style="text-align:left;box-shadow: 0px 1.5px">
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
 </tr>
@@ -2964,15 +2964,15 @@ lrscale
 </td>
 </tr>
 <tr>
-<td style="text-align:left;box-shadow: 0px 1px">
+<td style="text-align:left;box-shadow: 0px 1.5px">
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
 </tr>
@@ -3237,15 +3237,15 @@ lrscale
 </td>
 </tr>
 <tr>
-<td style="text-align:left;box-shadow: 0px 1px">
+<td style="text-align:left;box-shadow: 0px 1.5px">
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.099)
 </td>
 </tr>
@@ -3619,18 +3619,18 @@ lrscale
 </td>
 </tr>
 <tr>
-<td style="text-align:left;box-shadow: 0px 1px">
+<td style="text-align:left;box-shadow: 0px 1.5px">
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.088)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.099)
 </td>
-<td style="text-align:center;box-shadow: 0px 1px">
+<td style="text-align:center;box-shadow: 0px 1.5px">
 (0.100)
 </td>
 </tr>
@@ -3680,6 +3680,313 @@ R2 Adj.
 <td style="padding: 0; " colspan="100%">
 <sup></sup> Seriously say ‘hi’ to my mom. She’s in Ohio with my two
 cats.
+</td>
+</tr>
+</tfoot>
+</table>
+<p>FYI, <code>{modelsummary}</code> appears to be able to do this as
+well without having to bootstrap it yourself. In this function, notice
+that the “Bootstrap” model is just <code>M1</code>. We are using the
+<code>vcov</code> argument here to bootstrap for us.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">&quot;OLS&quot;</span> <span class="ot">=</span> M1,</span>
+<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a>                  <span class="st">&quot;WLS&quot;</span> <span class="ot">=</span> M5,</span>
+<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>                  <span class="st">&quot;HRSE&quot;</span> <span class="ot">=</span> M6,</span>
+<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a>                  <span class="st">&quot;Bootstrap&quot;</span> <span class="ot">=</span> M1),</span>
+<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a>             <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a>             <span class="at">vcov =</span> <span class="fu">c</span>(<span class="st">&quot;classical&quot;</span>, <span class="st">&quot;classical&quot;</span>, <span class="st">&quot;classical&quot;</span>, <span class="st">&quot;bootstrap&quot;</span>),</span>
+<span id="cb54-7"><a href="#cb54-7" tabindex="-1"></a>             <span class="at">R =</span> <span class="dv">1000</span>,</span>
+<span id="cb54-8"><a href="#cb54-8" tabindex="-1"></a>             <span class="at">gof_map =</span> <span class="fu">c</span>(<span class="st">&quot;nobs&quot;</span>, <span class="st">&quot;adj.r.squared&quot;</span>))</span></code></pre></div>
+<table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+OLS
+</th>
+<th style="text-align:center;">
+WLS
+</th>
+<th style="text-align:center;">
+HRSE
+</th>
+<th style="text-align:center;">
+Bootstrap
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:center;">
+11.655***
+</td>
+<td style="text-align:center;">
+12.148***
+</td>
+<td style="text-align:center;">
+11.655***
+</td>
+<td style="text-align:center;">
+11.655***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+(1.061)
+</td>
+<td style="text-align:center;">
+(1.041)
+</td>
+<td style="text-align:center;">
+(1.183)
+</td>
+<td style="text-align:center;">
+(1.150)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agea
+</td>
+<td style="text-align:center;">
+−0.002
+</td>
+<td style="text-align:center;">
+−0.003
+</td>
+<td style="text-align:center;">
+−0.002
+</td>
+<td style="text-align:center;">
+−0.002
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+(0.010)
+</td>
+<td style="text-align:center;">
+(0.010)
+</td>
+<td style="text-align:center;">
+(0.010)
+</td>
+<td style="text-align:center;">
+(0.010)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:center;">
+−0.248
+</td>
+<td style="text-align:center;">
+−0.242
+</td>
+<td style="text-align:center;">
+−0.248
+</td>
+<td style="text-align:center;">
+−0.248
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+(0.338)
+</td>
+<td style="text-align:center;">
+(0.336)
+</td>
+<td style="text-align:center;">
+(0.337)
+</td>
+<td style="text-align:center;">
+(0.325)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+eduyrs
+</td>
+<td style="text-align:center;">
+0.488***
+</td>
+<td style="text-align:center;">
+0.468***
+</td>
+<td style="text-align:center;">
+0.488***
+</td>
+<td style="text-align:center;">
+0.488***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+(0.049)
+</td>
+<td style="text-align:center;">
+(0.046)
+</td>
+<td style="text-align:center;">
+(0.059)
+</td>
+<td style="text-align:center;">
+(0.057)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+uempla
+</td>
+<td style="text-align:center;">
+−1.102
+</td>
+<td style="text-align:center;">
+−1.082
+</td>
+<td style="text-align:center;">
+−1.102
+</td>
+<td style="text-align:center;">
+−1.102
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+(1.204)
+</td>
+<td style="text-align:center;">
+(1.246)
+</td>
+<td style="text-align:center;">
+(1.343)
+</td>
+<td style="text-align:center;">
+(1.339)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hinctnta
+</td>
+<td style="text-align:center;">
+0.338***
+</td>
+<td style="text-align:center;">
+0.370***
+</td>
+<td style="text-align:center;">
+0.338***
+</td>
+<td style="text-align:center;">
+0.338***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+(0.061)
+</td>
+<td style="text-align:center;">
+(0.061)
+</td>
+<td style="text-align:center;">
+(0.064)
+</td>
+<td style="text-align:center;">
+(0.066)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lrscale
+</td>
+<td style="text-align:center;">
+−0.583***
+</td>
+<td style="text-align:center;">
+−0.643***
+</td>
+<td style="text-align:center;">
+−0.583***
+</td>
+<td style="text-align:center;">
+−0.583***
+</td>
+</tr>
+<tr>
+<td style="text-align:left;box-shadow: 0px 1.5px">
+</td>
+<td style="text-align:center;box-shadow: 0px 1.5px">
+(0.088)
+</td>
+<td style="text-align:center;box-shadow: 0px 1.5px">
+(0.088)
+</td>
+<td style="text-align:center;box-shadow: 0px 1.5px">
+(0.099)
+</td>
+<td style="text-align:center;box-shadow: 0px 1.5px">
+(0.101)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Num.Obs.
+</td>
+<td style="text-align:center;">
+1454
+</td>
+<td style="text-align:center;">
+1454
+</td>
+<td style="text-align:center;">
+1454
+</td>
+<td style="text-align:center;">
+1454
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+R2 Adj.
+</td>
+<td style="text-align:center;">
+0.145
+</td>
+<td style="text-align:center;">
+0.156
+</td>
+<td style="text-align:center;">
+0.145
+</td>
+<td style="text-align:center;">
+0.145
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; " colspan="100%">
+<sup></sup> + p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt;
+0.001
 </td>
 </tr>
 </tfoot>
