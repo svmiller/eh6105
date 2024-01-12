@@ -114,6 +114,7 @@ Think in terms of population averages.
 ### The Importance of Random Assignment
 
 Per random assignment: participants assigned to treatment/control must be same on average in the population ("equal in expectation").
+
 - i.e. $E[Y_i(T_i = 0 | Z_i = 1)]$ must be equal to $E[Y_i(T_i = 0 | Z_i = 0)]$
 
 By substitution:
@@ -302,6 +303,7 @@ Replication crises/academic misconduct are proliferating in social science. Exam
 
 - Economics: Reinhart and Rogoff's (2010) Excel error
     - *ed. their analysis was **way** more dishonest than the Excel error, but that got the most attention.*
+    - See: ["Revisiting Reinhart and Rogoff, Ten Years Later"](http://svmiller.com/blog/2020/04/reinhart-rogoff-ten-years-later-replication/) on my website.
 - Psychology: too many to list
     - Recurring themes: small-*n*, *p*-hacked experiments, or even fabricated data
 - Sociology/criminology: Stewart retractions
