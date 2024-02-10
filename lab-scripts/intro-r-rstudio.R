@@ -166,7 +166,7 @@ d <- pi # you can assign one built-in object to a new object.
 #' If you have yet to install these packages (and you almost certainly have not if you're opening R for the first time), install it as follows.
 #' Note that I'm just commenting out this command so it doesn't do this when I compile this script on my end. 
 # Take out the comment...
-# install.packages(c("tidyverse", "stevedata", "stevemisc", "stevetemplates", "lmtest"))
+install.packages(c("tidyverse", "stevedata", "stevemisc", "stevetemplates", "lmtest"))
 
 #' Once they're all installed, you can load the libraries with the `library()` command. 
 #' Of note: you only need to install a package once, but you'll need to load the library 
